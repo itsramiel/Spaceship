@@ -1,5 +1,5 @@
-import {atom, useAtomValue} from 'jotai';
-import {StyleSheet, Text, View} from 'react-native';
+import { atom, useAtomValue } from "jotai";
+import { StyleSheet, Text, View } from "react-native";
 
 export const scoreAtom = atom(0);
 
@@ -15,15 +15,15 @@ export function Score() {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     top: 16,
     right: 32,
     padding: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
     borderRadius: 4,
   },
   text: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
   },
 });

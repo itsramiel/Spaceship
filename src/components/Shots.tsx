@@ -6,17 +6,17 @@ import {
   Skia,
   StrokeCap,
   createPicture,
-} from '@shopify/react-native-skia';
-import {SharedValue, useDerivedValue} from 'react-native-reanimated';
-import {PRIMARY_COLOR, SHOT_LENGTH, SHOT_STROKE_WIDTH} from '../theme';
+} from "@shopify/react-native-skia";
+import { SharedValue, useDerivedValue } from "react-native-reanimated";
+import { PRIMARY_COLOR, SHOT_LENGTH, SHOT_STROKE_WIDTH } from "../theme";
 
 interface ShotProps {
   shots: SharedValue<Array<SkPoint>>;
 }
 
-export function Shots({shots}: ShotProps) {
+export function Shots({ shots }: ShotProps) {
   const picture = useDerivedValue(() => {
-    return createPicture(canvas => {
+    return createPicture((canvas) => {
       const glowPaint = Skia.Paint();
       glowPaint.setStyle(PaintStyle.Stroke);
       glowPaint.setStrokeWidth(SHOT_STROKE_WIDTH);
@@ -35,7 +35,7 @@ export function Shots({shots}: ShotProps) {
       const shotPaint = Skia.Paint();
       shotPaint.setStyle(PaintStyle.Stroke);
       shotPaint.setStrokeWidth(SHOT_STROKE_WIDTH / 2);
-      shotPaint.setColor(Skia.Color('white'));
+      shotPaint.setColor(Skia.Color("white"));
       shotPaint.setStrokeCap(StrokeCap.Round);
 
       for (const shot of shots.value) {

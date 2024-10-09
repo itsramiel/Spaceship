@@ -9,15 +9,15 @@ import {
   Skia,
   Transforms3d,
   useSVG,
-} from '@shopify/react-native-skia';
-import {SharedValue, useDerivedValue} from 'react-native-reanimated';
+} from "@shopify/react-native-skia";
+import { SharedValue, useDerivedValue } from "react-native-reanimated";
 import {
   BUTTON_STROKE_OPACITY,
   BUTTON_STROKE_WIDTH,
   PRIMARY_COLOR,
   SECONDARY_COLOR,
   TERTIARY_COLOR,
-} from '../theme';
+} from "../theme";
 
 const PARTIAL_CIRCLE_RATIO = 1 / 6;
 
@@ -31,9 +31,9 @@ interface JoystickProps {
   size: SharedValue<number>;
 }
 
-export function Joystick({size}: JoystickProps) {
-  const image = useSVG(require('../../assets/fingerprint.svg'));
-  const chevronUp = useSVG(require('../../assets/chevron-up-outline.svg'));
+export function Joystick({ size }: JoystickProps) {
+  const image = useSVG(require("../../assets/fingerprint.svg"));
+  const chevronUp = useSVG(require("../../assets/chevron-up-outline.svg"));
 
   const imageSize = useDerivedValue(() => {
     return size.value * FINGERPRINT_SIZE_RATIO;
@@ -89,7 +89,7 @@ export function Joystick({size}: JoystickProps) {
     );
   }, []);
 
-  const iconsTransformations = Array.from({length: 4}).map((_, i) =>
+  const iconsTransformations = Array.from({ length: 4 }).map((_, i) =>
     useDerivedValue((): Transforms3d => {
       const isEven = i % 2 === 0;
       const translationValue =
@@ -99,12 +99,12 @@ export function Joystick({size}: JoystickProps) {
           BUTTON_STROKE_WIDTH +
           innerCircleOuerCircleSpacing.value / 2);
 
-      const rotation = {rotate: i * (Math.PI / 2)};
+      const rotation = { rotate: i * (Math.PI / 2) };
 
       return [
         isEven
-          ? {translateY: translationValue}
-          : {translateX: translationValue},
+          ? { translateY: translationValue }
+          : { translateX: translationValue },
         rotation,
       ];
     }, []),
@@ -129,7 +129,8 @@ export function Joystick({size}: JoystickProps) {
           <Paint>
             <BlendColor color={TERTIARY_COLOR} mode="srcIn" />
           </Paint>
-        }>
+        }
+      >
         <ImageSVG
           svg={image}
           width={imageSize}
@@ -147,7 +148,7 @@ export function Joystick({size}: JoystickProps) {
         style="stroke"
         opacity={BUTTON_STROKE_OPACITY}
       />
-      {Array.from({length: 4}).map((_, index) => {
+      {Array.from({ length: 4 }).map((_, index) => {
         return (
           <Group
             transform={[
@@ -157,23 +158,25 @@ export function Joystick({size}: JoystickProps) {
                   index * (Math.PI / 2),
               },
             ]}
-            key={index}>
+            key={index}
+          >
             <Path
               path={path}
               start={0}
               end={PARTIAL_CIRCLE_RATIO}
               color={PRIMARY_COLOR}
-              strokeCap={'round'}
+              strokeCap={"round"}
               style="stroke"
-              strokeWidth={2 * BUTTON_STROKE_WIDTH}>
+              strokeWidth={2 * BUTTON_STROKE_WIDTH}
+            >
               <Blur blur={3} />
             </Path>
             <Path
               path={path}
               start={0}
               end={PARTIAL_CIRCLE_RATIO}
-              color={'white'}
-              strokeCap={'round'}
+              color={"white"}
+              strokeCap={"round"}
               style="stroke"
               strokeWidth={BUTTON_STROKE_WIDTH / 2}
             />
@@ -183,10 +186,11 @@ export function Joystick({size}: JoystickProps) {
       <Group
         layer={
           <Paint>
-            <BlendColor color={'white'} mode="srcIn" />
+            <BlendColor color={"white"} mode="srcIn" />
           </Paint>
-        }>
-        {Array.from({length: 4}).map((_, index) => {
+        }
+      >
+        {Array.from({ length: 4 }).map((_, index) => {
           return (
             <Group transform={iconsTransformations[index]} key={index}>
               <ImageSVG

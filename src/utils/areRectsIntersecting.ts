@@ -1,7 +1,7 @@
-import {SkRect} from '@shopify/react-native-skia';
+import { SkRect } from "@shopify/react-native-skia";
 
 export function areRectsIntersecting(rect1: SkRect, rect2: SkRect) {
-  'worklet';
+  "worklet";
   const x11 = rect1.x;
   const y11 = rect1.y;
   const x12 = rect1.x + rect1.width;

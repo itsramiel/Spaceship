@@ -1,15 +1,15 @@
-import {StyleSheet, View} from 'react-native';
-import {useDerivedValue, useSharedValue} from 'react-native-reanimated';
-import {Canvas, Group, Transforms3d} from '@shopify/react-native-skia';
+import { StyleSheet, View } from "react-native";
+import { useDerivedValue, useSharedValue } from "react-native-reanimated";
+import { Canvas, Group, Transforms3d } from "@shopify/react-native-skia";
 
-import {ShootButton} from './ShootButton';
+import { ShootButton } from "./ShootButton";
 
 export function Playground() {
-  const size = useSharedValue({width: 0, height: 0});
+  const size = useSharedValue({ width: 0, height: 0 });
   const transform = useDerivedValue((): Transforms3d => {
     return [
-      {translateX: size.value.width / 2},
-      {translateY: size.value.height / 2},
+      { translateX: size.value.width / 2 },
+      { translateY: size.value.height / 2 },
     ];
   }, []);
 
@@ -31,7 +31,7 @@ export function Playground() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
+    backgroundColor: "#1E1E1E",
   },
   canvas: {
     flex: 1,

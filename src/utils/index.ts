@@ -1,1 +1,1 @@
-export * from './areRectsIntersecting';
+export * from "./areRectsIntersecting";

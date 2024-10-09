@@ -4,7 +4,7 @@ import Animated, {
   useDerivedValue,
   useFrameCallback,
   useSharedValue,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 import {
   Canvas,
   Group,
@@ -13,17 +13,17 @@ import {
   Transforms3d,
   clamp,
   useImage,
-} from '@shopify/react-native-skia';
-import {useSetAtom} from 'jotai';
-import {StyleSheet, View} from 'react-native';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+} from "@shopify/react-native-skia";
+import { useSetAtom } from "jotai";
+import { StyleSheet, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-import {Shots} from './Shots';
-import {Stars} from './Stars';
-import {Enemies} from './Enemies';
-import {Joystick} from './Joystick';
-import {ShootButton} from './ShootButton';
-import {TEnemy, TRectSize, TShot, TStar} from '../types';
+import { Shots } from "./Shots";
+import { Stars } from "./Stars";
+import { Enemies } from "./Enemies";
+import { Joystick } from "./Joystick";
+import { ShootButton } from "./ShootButton";
+import { TEnemy, TRectSize, TShot, TStar } from "../types";
 import {
   CONITNUOUS_SHOOTING_RATE as CONTINUOUS_SHOOTING_RATE,
   SHOT_LENGTH,
@@ -31,9 +31,9 @@ import {
   SPACESHIP_IMAGE_HEIGHT,
   SPACESHIP_IMAGE_WIDTH,
   SPACESHIP_START_PADDING,
-} from '../theme';
-import {Score, scoreAtom} from './Score';
-import {areRectsIntersecting} from '../utils';
+} from "../theme";
+import { Score, scoreAtom } from "./Score";
+import { areRectsIntersecting } from "../utils";
 
 const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
 const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
@@ -49,10 +49,10 @@ export function Game() {
   const setScore = useSetAtom(scoreAtom);
 
   function incrementScore() {
-    setScore(prevScore => prevScore + 1);
+    setScore((prevScore) => prevScore + 1);
   }
 
-  const size = useSharedValue({width: 0, height: 0});
+  const size = useSharedValue({ width: 0, height: 0 });
   const stars = useSharedValue<Array<TStar>>([]);
   const enemies = useSharedValue<Array<TEnemy>>([]);
 
@@ -82,13 +82,13 @@ export function Game() {
 
   const shootButtonViewStyle = useAnimatedStyle(() => {
     return {
-      position: 'absolute',
+      position: "absolute",
       top: -shootButtonSize.value / 2,
       left: -shootButtonSize.value / 2,
       width: shootButtonSize.value,
       height: shootButtonSize.value,
       borderRadius: shootButtonSize.value / 2,
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       transform: [
         {
           translateX:
@@ -105,15 +105,15 @@ export function Game() {
 
   const joystickGestureViewStyle = useAnimatedStyle(() => {
     return {
-      position: 'absolute',
+      position: "absolute",
       top: -joystickSize.value / 2,
       left: -joystickSize.value / 2,
       width: joystickSize.value,
       height: joystickSize.value,
       borderRadius: joystickSize.value / 2,
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       transform: [
-        {translateX: JOYSTICK_PADDING_HORIZONTAL + joystickSize.value / 2},
+        { translateX: JOYSTICK_PADDING_HORIZONTAL + joystickSize.value / 2 },
         {
           translateY:
             size.value.height -
@@ -126,7 +126,7 @@ export function Game() {
 
   const joystickTransform = useDerivedValue((): Transforms3d => {
     return [
-      {translateX: JOYSTICK_PADDING_HORIZONTAL + joystickSize.value / 2},
+      { translateX: JOYSTICK_PADDING_HORIZONTAL + joystickSize.value / 2 },
       {
         translateY:
           size.value.height -
@@ -136,9 +136,9 @@ export function Game() {
     ];
   }, []);
 
-  const panValue = useSharedValue({x: 0, y: 0});
+  const panValue = useSharedValue({ x: 0, y: 0 });
 
-  const spaceshipImage = useImage(require('../../assets/rocket.png'));
+  const spaceshipImage = useImage(require("../../assets/rocket.png"));
 
   const spaceshipHeight = useDerivedValue(() => {
     return 0.1 * size.value.width;
@@ -159,12 +159,12 @@ export function Game() {
   }, []);
 
   const spaceshipPanTransform = useDerivedValue((): Transforms3d => {
-    return [{translateX: spaceshipX.value}, {translateY: spaceshipY.value}];
+    return [{ translateX: spaceshipX.value }, { translateY: spaceshipY.value }];
   }, []);
 
   const gesture = Gesture.Pan()
     .minDistance(0)
-    .onChange(e => {
+    .onChange((e) => {
       panValue.value = {
         x: clamp(
           panValue.value.x + e.changeX,
@@ -184,7 +184,7 @@ export function Game() {
   const msLastShotCreated = useSharedValue(0);
 
   function createShot() {
-    'worklet';
+    "worklet";
     return {
       x: spaceshipWidth.value + SPACESHIP_START_PADDING + panValue.value.x,
       y: size.value.height / 2 + panValue.value.y,
@@ -195,7 +195,7 @@ export function Game() {
     Gesture.Tap()
       .maxDuration(250)
       .onStart(() => {
-        shots.modify(value => {
+        shots.modify((value) => {
           value.push(createShot());
 
           return value;
@@ -213,7 +213,7 @@ export function Game() {
   );
 
   // Continuously move enemies, shots
-  useFrameCallback(frameInfo => {
+  useFrameCallback((frameInfo) => {
     if (!frameInfo.timeSincePreviousFrame || isGameOver.value) return;
 
     const inFrameEnemies = Array<TEnemy>();
@@ -301,9 +301,9 @@ export function Game() {
     shots.value = newShots;
 
     const rectSizes: Array<TRectSize> = [
-      {width: 0.2, height: 1},
-      {width: 0.6, height: 0.6},
-      {width: 0.2, height: 0.2},
+      { width: 0.2, height: 1 },
+      { width: 0.6, height: 0.6 },
+      { width: 0.2, height: 0.2 },
     ];
 
     const rects = new Array<SkRect>();
@@ -325,7 +325,7 @@ export function Game() {
       rects.push(rect);
     }
     // Check if enemy reached leftmost edge of screen
-    rects.push({x: -1, y: 0, width: 1, height: size.value.height});
+    rects.push({ x: -1, y: 0, width: 1, height: size.value.height });
 
     for (const enemy of newEnemies) {
       for (const rect of rects) {
@@ -382,7 +382,7 @@ export function Game() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
+    backgroundColor: "#1E1E1E",
   },
   canvas: {
     flex: 1,

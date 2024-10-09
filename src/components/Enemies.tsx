@@ -3,49 +3,49 @@ import {
   useDerivedValue,
   useFrameCallback,
   useSharedValue,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 import {
   Picture,
   Skia,
   createPicture,
   useImage,
-} from '@shopify/react-native-skia';
-import {TEnemy} from '../types';
+} from "@shopify/react-native-skia";
+import { TEnemy } from "../types";
 
 const ENEMY_SIZE = 33;
 const ENEMY_CREATE_INTERVAL = 1000;
 
 interface EnemiesProps {
   enemies: SharedValue<Array<TEnemy>>;
-  canvasSize: SharedValue<{width: number; height: number}>;
+  canvasSize: SharedValue<{ width: number; height: number }>;
 }
 
-export function Enemies({enemies, canvasSize}: EnemiesProps) {
-  const {image: enemy1Image, size: enemy1Size} = {
-    image: useImage(require('../../assets/enemy1.png')),
+export function Enemies({ enemies, canvasSize }: EnemiesProps) {
+  const { image: enemy1Image, size: enemy1Size } = {
+    image: useImage(require("../../assets/enemy1.png")),
     size: 480,
   };
-  const {image: enemy2Image, size: enemy2Size} = {
-    image: useImage(require('../../assets/enemy2.png')),
+  const { image: enemy2Image, size: enemy2Size } = {
+    image: useImage(require("../../assets/enemy2.png")),
     size: 480,
   };
-  const {image: enemy3Image, size: enemy3Size} = {
-    image: useImage(require('../../assets/enemy3.png')),
+  const { image: enemy3Image, size: enemy3Size } = {
+    image: useImage(require("../../assets/enemy3.png")),
     size: 480,
   };
-  const {image: enemy4Image, size: enemy4Size} = {
-    image: useImage(require('../../assets/enemy4.png')),
+  const { image: enemy4Image, size: enemy4Size } = {
+    image: useImage(require("../../assets/enemy4.png")),
     size: 478,
   };
 
   const msLastEnemyCreated = useSharedValue(ENEMY_CREATE_INTERVAL);
 
-  useFrameCallback(frameInfo => {
+  useFrameCallback((frameInfo) => {
     if (!frameInfo.timeSincePreviousFrame) return;
 
     if (msLastEnemyCreated.value >= ENEMY_CREATE_INTERVAL) {
-      enemies.modify(value => {
-        'worklet';
+      enemies.modify((value) => {
+        "worklet";
         const enemySize =
           (Math.random() * ENEMY_SIZE) / 4 + (ENEMY_SIZE * 3) / 4;
 
@@ -66,7 +66,7 @@ export function Enemies({enemies, canvasSize}: EnemiesProps) {
   });
 
   const picture = useDerivedValue(() => {
-    return createPicture(canvas => {
+    return createPicture((canvas) => {
       if (!enemy1Image || !enemy2Image || !enemy3Image || !enemy4Image) return;
       const paint = Skia.Paint();
 

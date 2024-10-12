@@ -19,15 +19,16 @@ export function Countdown({ countdown }: CountdownProps) {
   useEffect(() => {
     progress.value = 0;
     if (typeof countdown === "number") {
-      progress.value = withTiming(1, { duration: 3000 });
+      progress.value = withTiming(1, { duration: 1000 });
     }
   }, [countdown]);
 
   const rStyle = useAnimatedStyle(() => {
     return {
-      fontSize: interpolate(progress.value, [0, 1], [64, 128]),
+      fontSize: 64,
       color: "white",
       fontWeight: "bold",
+      transform: [{ scale: interpolate(progress.value, [0, 1], [1, 2]) }],
     };
   }, []);
 

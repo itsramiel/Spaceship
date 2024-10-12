@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 import { Button } from "./Button";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 interface PlayViewProps {
   onStartGame: () => void;
@@ -8,7 +9,7 @@ interface PlayViewProps {
 
 export function PlayView({ onStartGame }: PlayViewProps) {
   return (
-    <View style={styles.screen}>
+    <Animated.View style={styles.screen} entering={FadeIn} exiting={FadeOut}>
       <View style={styles.container}>
         <Button
           text="Start Game"
@@ -17,7 +18,7 @@ export function PlayView({ onStartGame }: PlayViewProps) {
           onPress={onStartGame}
         />
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

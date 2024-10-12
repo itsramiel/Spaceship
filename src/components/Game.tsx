@@ -9,6 +9,7 @@ import {
   Canvas,
   Group,
   Image,
+  Picture,
   SkRect,
   Transforms3d,
   clamp,
@@ -35,6 +36,8 @@ import {
 import { Score, scoreAtom } from "./Score";
 import { areRectsIntersecting } from "../utils";
 import { PlayView } from "./PlayView";
+import { useState } from "react";
+import { Countdown } from "./Countdown";
 
 const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
 const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
@@ -46,6 +49,9 @@ const SHOOT_BUTTON_PADDING_RIGHT = 48;
 const CONSTANT_SHOOTING_INTERVAL = 100;
 
 export function Game() {
+  const [isStartGameModalDisplayed, setIsStartGameModalDisplayed] =
+    useState(true);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const isGameOver = useSharedValue(false);
   const setScore = useSetAtom(scoreAtom);
 
@@ -376,7 +382,17 @@ export function Game() {
         <Animated.View style={shootButtonViewStyle} />
       </GestureDetector>
       <Score />
-      <PlayView />
+      {isStartGameModalDisplayed ? (
+        <PlayView
+          onStartGame={() => {
+            setIsStartGameModalDisplayed(false);
+            setTimeout(() => {
+              setCountdown(3);
+            }, 200);
+          }}
+        />
+      ) : null}
+      <Countdown countdown={countdown} />
     </View>
   );
 }

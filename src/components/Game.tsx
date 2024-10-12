@@ -34,6 +34,7 @@ import {
 } from "../theme";
 import { Score, scoreAtom } from "./Score";
 import { areRectsIntersecting } from "../utils";
+import { PlayView } from "./PlayView";
 
 const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
 const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
@@ -375,6 +376,7 @@ export function Game() {
         <Animated.View style={shootButtonViewStyle} />
       </GestureDetector>
       <Score />
+      <PlayView />
     </View>
   );
 }

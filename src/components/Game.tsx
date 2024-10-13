@@ -1,10 +1,14 @@
 import Animated, {
+  Easing,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useFrameCallback,
   useSharedValue,
+  withDelay,
+  withTiming,
+  WithTimingConfig,
 } from "react-native-reanimated";
 import {
   Canvas,
@@ -15,7 +19,6 @@ import {
   clamp,
   useImage,
 } from "@shopify/react-native-skia";
-import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { Shots } from "./Shots";
@@ -38,7 +41,8 @@ import { PlayView } from "./PlayView";
 import { useState } from "react";
 import { Countdown } from "./Countdown";
 import { SharedValuesProvider } from "./SharedValuesProvider";
-import { scoreStoreActions } from "../stores";
+import { scoreStoreActions, selectIsFirstPlay, useScoreStore } from "../stores";
+import { StyleSheet, View } from "react-native";
 
 const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
 const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
@@ -141,7 +145,8 @@ export function Game() {
     ];
   }, []);
 
-  const panValue = useSharedValue({ x: 0, y: 0 });
+  const panValueX = useSharedValue(0);
+  const panValueY = useSharedValue(0);
 
   const spaceshipImage = useImage(require("../../assets/rocket.png"));
 
@@ -156,11 +161,11 @@ export function Game() {
   }, []);
 
   const spaceshipX = useDerivedValue(() => {
-    return SPACESHIP_START_PADDING + panValue.value.x;
+    return SPACESHIP_START_PADDING + panValueX.value;
   }, []);
 
   const spaceshipY = useDerivedValue(() => {
-    return size.value.height / 2 - spaceshipHeight.value / 2 + panValue.value.y;
+    return size.value.height / 2 - spaceshipHeight.value / 2 + panValueY.value;
   }, []);
 
   const spaceshipPanTransform = useDerivedValue((): Transforms3d => {
@@ -170,18 +175,16 @@ export function Game() {
   const gesture = Gesture.Pan()
     .minDistance(0)
     .onChange((e) => {
-      panValue.value = {
-        x: clamp(
-          panValue.value.x + e.changeX,
-          -SPACESHIP_START_PADDING,
-          size.value.width - spaceshipWidth.value - SPACESHIP_START_PADDING,
-        ),
-        y: clamp(
-          panValue.value.y + e.changeY,
-          -(size.value.height / 2),
-          size.value.height / 2,
-        ),
-      };
+      panValueX.value = clamp(
+        panValueX.value + e.changeX,
+        -SPACESHIP_START_PADDING,
+        size.value.width - spaceshipWidth.value - SPACESHIP_START_PADDING,
+      );
+      panValueY.value = clamp(
+        panValueY.value + e.changeY,
+        -(size.value.height / 2),
+        size.value.height / 2,
+      );
     });
 
   const shots = useSharedValue<Array<TShot>>([]);
@@ -191,8 +194,8 @@ export function Game() {
   function createShot() {
     "worklet";
     return {
-      x: spaceshipWidth.value + SPACESHIP_START_PADDING + panValue.value.x,
-      y: size.value.height / 2 + panValue.value.y,
+      x: spaceshipWidth.value + SPACESHIP_START_PADDING + panValueX.value,
+      y: size.value.height / 2 + panValueY.value,
     };
   }
 
@@ -358,12 +361,32 @@ export function Game() {
   );
 
   function onStartGame() {
-    enemies.value = [];
-    shots.value = [];
+    const isFirstPlay = selectIsFirstPlay(useScoreStore.getState());
+    if (!isFirstPlay) {
+      enemies.value = [];
+      shots.value = [];
+    }
     setIsStartGameModalDisplayed(false);
-    setTimeout(() => {
-      setIsCountdownDisplayed(true);
-    }, 200);
+    const displayCountdown = () => {
+      setTimeout(() => {
+        setIsCountdownDisplayed(true);
+      }, 200);
+    };
+    const config: WithTimingConfig = {
+      duration: 1000,
+      easing: Easing.inOut(Easing.ease),
+    };
+    if (!isFirstPlay) {
+      panValueY.value = withDelay(300, withTiming(0, config));
+      panValueX.value = withDelay(
+        300,
+        withTiming(0, config, () => {
+          runOnJS(displayCountdown)();
+        }),
+      );
+    } else {
+      displayCountdown();
+    }
   }
 
   function onCountdownEnd() {

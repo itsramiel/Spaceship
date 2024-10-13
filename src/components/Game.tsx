@@ -1,5 +1,6 @@
 import Animated, {
   runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useFrameCallback,
@@ -14,7 +15,6 @@ import {
   clamp,
   useImage,
 } from "@shopify/react-native-skia";
-import { useSetAtom } from "jotai";
 import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
@@ -32,12 +32,13 @@ import {
   SPACESHIP_IMAGE_WIDTH,
   SPACESHIP_START_PADDING,
 } from "../theme";
-import { Score, scoreAtom } from "./Score";
+import { Score } from "./Score";
 import { areRectsIntersecting } from "../utils";
 import { PlayView } from "./PlayView";
 import { useState } from "react";
 import { Countdown } from "./Countdown";
 import { SharedValuesProvider } from "./SharedValuesProvider";
+import { scoreStoreActions } from "../stores";
 
 const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
 const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
@@ -52,12 +53,9 @@ export function Game() {
   const [isStartGameModalDisplayed, setIsStartGameModalDisplayed] =
     useState(true);
   const [isCountdownDisplayed, setIsCountdownDisplayed] = useState(false);
-  const isPlaying = useSharedValue(false);
-  const setScore = useSetAtom(scoreAtom);
-
-  function incrementScore() {
-    setScore((prevScore) => prevScore + 1);
-  }
+  const gameInfo = useSharedValue<
+    { isPlaying: true } | { isPlaying: false; didLose: boolean }
+  >({ isPlaying: false, didLose: false });
 
   const size = useSharedValue({ width: 0, height: 0 });
   const stars = useSharedValue<Array<TStar>>([]);
@@ -221,7 +219,7 @@ export function Game() {
 
   // Continuously move enemies, shots
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || !isPlaying.value) return;
+    if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;
 
     const inFrameEnemies = Array<TEnemy>();
 
@@ -279,7 +277,7 @@ export function Game() {
       if (!isEnemyDead) {
         newEnemies.push(enemy);
       } else {
-        runOnJS(incrementScore)();
+        runOnJS(scoreStoreActions.incrementScore)();
       }
     }
 
@@ -343,17 +341,46 @@ export function Game() {
           height: enemy.size,
         });
         if (didEnemyHitSpaceShip) {
-          isPlaying.value = false;
+          gameInfo.value = { isPlaying: false, didLose: true };
           break;
         }
       }
     }
   });
 
+  useAnimatedReaction(
+    () => gameInfo.value,
+    (curr, prev) => {
+      if (curr && prev && !curr.isPlaying && prev.isPlaying) {
+        runOnJS(setIsStartGameModalDisplayed)(true);
+      }
+    },
+  );
+
+  function onStartGame() {
+    enemies.value = [];
+    shots.value = [];
+    setIsStartGameModalDisplayed(false);
+    setTimeout(() => {
+      setIsCountdownDisplayed(true);
+    }, 200);
+  }
+
+  function onCountdownEnd() {
+    setIsCountdownDisplayed(false);
+    scoreStoreActions.resetScore();
+
+    gameInfo.modify((value) => {
+      "worklet";
+      value.isPlaying = true;
+      return value;
+    });
+  }
+
   return (
     <View style={styles.screen}>
       <Canvas style={styles.canvas} onSize={size}>
-        <SharedValuesProvider isPlaying={isPlaying}>
+        <SharedValuesProvider gameInfo={gameInfo}>
           <Stars stars={stars} canvasSize={size} />
           <Group transform={spaceshipPanTransform}>
             <Image
@@ -385,21 +412,10 @@ export function Game() {
       </GestureDetector>
       <Score />
       {isStartGameModalDisplayed ? (
-        <PlayView
-          onStartGame={() => {
-            setIsStartGameModalDisplayed(false);
-            setTimeout(() => {
-              setIsCountdownDisplayed(true);
-            }, 200);
-          }}
-        />
+        <PlayView onStartGame={onStartGame} />
       ) : null}
       {isCountdownDisplayed ? (
-        <Countdown
-          onCountdownEnd={() => {
-            isPlaying.value = true;
-          }}
-        />
+        <Countdown onCountdownEnd={onCountdownEnd} />
       ) : null}
     </View>
   );

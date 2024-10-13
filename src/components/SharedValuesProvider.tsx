@@ -2,7 +2,9 @@ import React from "react";
 import { SharedValue } from "react-native-reanimated";
 
 type TSharedValuesContext = {
-  isPlaying: SharedValue<boolean>;
+  gameInfo: SharedValue<
+    { isPlaying: true } | { isPlaying: false; didLose: boolean }
+  >;
 };
 
 const SharedValuesContext = React.createContext<TSharedValuesContext>(

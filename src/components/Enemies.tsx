@@ -40,10 +40,10 @@ export function Enemies({ enemies, canvasSize }: EnemiesProps) {
   };
 
   const msLastEnemyCreated = useSharedValue(ENEMY_CREATE_INTERVAL);
-  const { isPlaying } = useSharedValues();
+  const { gameInfo } = useSharedValues();
 
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || !isPlaying.value) return;
+    if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;
 
     if (msLastEnemyCreated.value >= ENEMY_CREATE_INTERVAL) {
       enemies.modify((value) => {

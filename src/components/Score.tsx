@@ -1,10 +1,10 @@
-import { atom, useAtomValue } from "jotai";
 import { StyleSheet, Text, View } from "react-native";
-
-export const scoreAtom = atom(0);
+import { useScoreStore } from "../stores";
 
 export function Score() {
-  const score = useAtomValue(scoreAtom);
+  const score = useScoreStore((store) => store.state.latestScore);
+
+  if (typeof score !== "number") return null;
 
   return (
     <View style={styles.container}>

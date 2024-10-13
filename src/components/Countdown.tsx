@@ -31,7 +31,6 @@ export function Countdown({ onCountdownEnd }: CountdownProps) {
   }, []);
 
   const onCountdownVisible = () => {
-    console.log("beep");
     beep?.playFromPositionAsync(0);
   };
 

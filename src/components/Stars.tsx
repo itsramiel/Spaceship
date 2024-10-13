@@ -28,10 +28,10 @@ interface StarsProps {
 }
 
 export function Stars({ stars, canvasSize }: StarsProps) {
-  const { isPlaying } = useSharedValues();
+  const { gameInfo } = useSharedValues();
 
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || !isPlaying.value) return;
+    if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;
     const timeSincePreviousFrame = frameInfo.timeSincePreviousFrame;
 
     stars.value = stars.value.map((star) => {

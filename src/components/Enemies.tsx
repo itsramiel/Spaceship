@@ -18,10 +18,9 @@ const ENEMY_CREATE_INTERVAL = 1000;
 
 interface EnemiesProps {
   enemies: SharedValue<Array<TEnemy>>;
-  canvasSize: SharedValue<{ width: number; height: number }>;
 }
 
-export function Enemies({ enemies, canvasSize }: EnemiesProps) {
+export function Enemies({ enemies }: EnemiesProps) {
   const { image: enemy1Image, size: enemy1Size } = {
     image: useImage(require("../../assets/enemy1.png")),
     size: 480,
@@ -40,7 +39,7 @@ export function Enemies({ enemies, canvasSize }: EnemiesProps) {
   };
 
   const msLastEnemyCreated = useSharedValue(ENEMY_CREATE_INTERVAL);
-  const { gameInfo } = useSharedValues();
+  const { gameInfo, canvasSize } = useSharedValues();
 
   useFrameCallback((frameInfo) => {
     if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;

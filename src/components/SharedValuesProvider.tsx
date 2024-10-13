@@ -5,6 +5,7 @@ type TSharedValuesContext = {
   gameInfo: SharedValue<
     { isPlaying: true } | { isPlaying: false; didLose: boolean }
   >;
+  canvasSize: SharedValue<{ width: number; height: number }>;
 };
 
 const SharedValuesContext = React.createContext<TSharedValuesContext>(

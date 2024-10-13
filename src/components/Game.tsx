@@ -403,8 +403,8 @@ export function Game() {
   return (
     <View style={styles.screen}>
       <Canvas style={styles.canvas} onSize={size}>
-        <SharedValuesProvider gameInfo={gameInfo}>
-          <Stars stars={stars} canvasSize={size} />
+        <SharedValuesProvider gameInfo={gameInfo} canvasSize={size}>
+          <Stars stars={stars} />
           <Group transform={spaceshipPanTransform}>
             <Image
               x={0}
@@ -417,7 +417,7 @@ export function Game() {
           <Group transform={joystickTransform}>
             <Joystick size={joystickSize} />
           </Group>
-          <Enemies enemies={enemies} canvasSize={size} />
+          <Enemies enemies={enemies} />
           <Group transform={shootButtonTransform}>
             <ShootButton
               size={shootButtonSize}

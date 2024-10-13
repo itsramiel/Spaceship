@@ -24,11 +24,10 @@ const STARS_SPEED = 1 / 160; // 1 point per 160 milliseconds
 
 interface StarsProps {
   stars: SharedValue<Array<TStar>>;
-  canvasSize: SharedValue<{ width: number; height: number }>;
 }
 
-export function Stars({ stars, canvasSize }: StarsProps) {
-  const { gameInfo } = useSharedValues();
+export function Stars({ stars }: StarsProps) {
+  const { gameInfo, canvasSize } = useSharedValues();
 
   useFrameCallback((frameInfo) => {
     if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;

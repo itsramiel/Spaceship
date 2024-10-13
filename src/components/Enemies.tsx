@@ -11,6 +11,7 @@ import {
   useImage,
 } from "@shopify/react-native-skia";
 import { TEnemy } from "../types";
+import { useSharedValues } from "./SharedValuesProvider";
 
 const ENEMY_SIZE = 33;
 const ENEMY_CREATE_INTERVAL = 1000;
@@ -39,9 +40,10 @@ export function Enemies({ enemies, canvasSize }: EnemiesProps) {
   };
 
   const msLastEnemyCreated = useSharedValue(ENEMY_CREATE_INTERVAL);
+  const { isPlaying } = useSharedValues();
 
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame) return;
+    if (!frameInfo.timeSincePreviousFrame || !isPlaying.value) return;
 
     if (msLastEnemyCreated.value >= ENEMY_CREATE_INTERVAL) {
       enemies.modify((value) => {

@@ -37,6 +37,7 @@ import { areRectsIntersecting } from "../utils";
 import { PlayView } from "./PlayView";
 import { useState } from "react";
 import { Countdown } from "./Countdown";
+import { SharedValuesProvider } from "./SharedValuesProvider";
 
 const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
 const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
@@ -352,27 +353,29 @@ export function Game() {
   return (
     <View style={styles.screen}>
       <Canvas style={styles.canvas} onSize={size}>
-        <Stars stars={stars} canvasSize={size} />
-        <Group transform={spaceshipPanTransform}>
-          <Image
-            x={0}
-            y={0}
-            image={spaceshipImage}
-            width={spaceshipWidth}
-            height={spaceshipHeight}
-          />
-        </Group>
-        <Group transform={joystickTransform}>
-          <Joystick size={joystickSize} />
-        </Group>
-        <Enemies enemies={enemies} canvasSize={size} />
-        <Group transform={shootButtonTransform}>
-          <ShootButton
-            size={shootButtonSize}
-            continuousShootingRate={continuousShootingRate}
-          />
-        </Group>
-        <Shots shots={shots} />
+        <SharedValuesProvider isPlaying={isPlaying}>
+          <Stars stars={stars} canvasSize={size} />
+          <Group transform={spaceshipPanTransform}>
+            <Image
+              x={0}
+              y={0}
+              image={spaceshipImage}
+              width={spaceshipWidth}
+              height={spaceshipHeight}
+            />
+          </Group>
+          <Group transform={joystickTransform}>
+            <Joystick size={joystickSize} />
+          </Group>
+          <Enemies enemies={enemies} canvasSize={size} />
+          <Group transform={shootButtonTransform}>
+            <ShootButton
+              size={shootButtonSize}
+              continuousShootingRate={continuousShootingRate}
+            />
+          </Group>
+          <Shots shots={shots} />
+        </SharedValuesProvider>
       </Canvas>
       <GestureDetector gesture={gesture}>
         <Animated.View style={joystickGestureViewStyle} />

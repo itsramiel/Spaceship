@@ -4,7 +4,8 @@ import {
   useDerivedValue,
   useFrameCallback,
 } from "react-native-reanimated";
-import { Skia, createPicture, Picture, size } from "@shopify/react-native-skia";
+import { Skia, createPicture, Picture } from "@shopify/react-native-skia";
+import { useSharedValues } from "./SharedValuesProvider";
 
 type TStar = {
   x: number;
@@ -14,7 +15,7 @@ type TStar = {
 
 const STAR_SIZE_MAX_SIZE = 4;
 
-function isOutOfBounds(star: TStar, canvas: { width: number; height: number }) {
+function isOutOfBounds(star: TStar) {
   "worklet";
   return star.x < -star.size / 2;
 }
@@ -27,12 +28,14 @@ interface StarsProps {
 }
 
 export function Stars({ stars, canvasSize }: StarsProps) {
+  const { isPlaying } = useSharedValues();
+
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame) return;
+    if (!frameInfo.timeSincePreviousFrame || !isPlaying.value) return;
     const timeSincePreviousFrame = frameInfo.timeSincePreviousFrame;
 
     stars.value = stars.value.map((star) => {
-      if (isOutOfBounds(star, canvasSize.value)) {
+      if (isOutOfBounds(star)) {
         return {
           x: canvasSize.value.width + star.size / 2,
           y:

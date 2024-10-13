@@ -9,7 +9,6 @@ import {
   Canvas,
   Group,
   Image,
-  Picture,
   SkRect,
   Transforms3d,
   clamp,
@@ -51,8 +50,8 @@ const CONSTANT_SHOOTING_INTERVAL = 100;
 export function Game() {
   const [isStartGameModalDisplayed, setIsStartGameModalDisplayed] =
     useState(true);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const isGameOver = useSharedValue(false);
+  const [isCountdownDisplayed, setIsCountdownDisplayed] = useState(false);
+  const isPlaying = useSharedValue(false);
   const setScore = useSetAtom(scoreAtom);
 
   function incrementScore() {
@@ -221,7 +220,7 @@ export function Game() {
 
   // Continuously move enemies, shots
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || isGameOver.value) return;
+    if (!frameInfo.timeSincePreviousFrame || !isPlaying.value) return;
 
     const inFrameEnemies = Array<TEnemy>();
 
@@ -343,7 +342,7 @@ export function Game() {
           height: enemy.size,
         });
         if (didEnemyHitSpaceShip) {
-          isGameOver.value = true;
+          isPlaying.value = false;
           break;
         }
       }
@@ -387,12 +386,18 @@ export function Game() {
           onStartGame={() => {
             setIsStartGameModalDisplayed(false);
             setTimeout(() => {
-              setCountdown(3);
+              setIsCountdownDisplayed(true);
             }, 200);
           }}
         />
       ) : null}
-      <Countdown countdown={countdown} />
+      {isCountdownDisplayed ? (
+        <Countdown
+          onCountdownEnd={() => {
+            isPlaying.value = true;
+          }}
+        />
+      ) : null}
     </View>
   );
 }

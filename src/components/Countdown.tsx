@@ -1,27 +1,25 @@
-import { Fragment, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
   interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { StyleSheet, View } from "react-native";
+import { Fragment, useEffect, useState } from "react";
+
+import { useSound } from "../hooks/useSound";
 
 interface CountdownProps {
-  countdown: number | null;
+  onCountdownEnd: () => void;
 }
 
-export function Countdown({ countdown }: CountdownProps) {
+export function Countdown({ onCountdownEnd }: CountdownProps) {
+  const [countdown, setCountdown] = useState<number | null>(null);
   const progress = useSharedValue(0);
-
-  useEffect(() => {
-    progress.value = 0;
-    if (typeof countdown === "number") {
-      progress.value = withTiming(1, { duration: 1000 });
-    }
-  }, [countdown]);
+  const beep = useSound(require("../../assets/sounds/beep.mp3"));
 
   const rStyle = useAnimatedStyle(() => {
     return {
@@ -32,6 +30,24 @@ export function Countdown({ countdown }: CountdownProps) {
     };
   }, []);
 
+  const onCountdownVisible = () => {
+    console.log("beep");
+    beep?.playFromPositionAsync(0);
+  };
+
+  const onCountdownScaled = (countdown: number) => {
+    setCountdown(countdown - 1);
+    if (countdown === 1) onCountdownEnd();
+  };
+
+  useEffect(() => {
+    if (!beep) return;
+
+    setCountdown(3);
+  }, [beep]);
+
+  if (typeof countdown !== "number") return null;
+
   return (
     <View style={styles.container} pointerEvents="none">
       {Array.from({ length: 3 }).map((_, i) => {
@@ -39,7 +55,17 @@ export function Countdown({ countdown }: CountdownProps) {
         return (
           <Fragment key={i}>
             {countdown === current ? (
-              <Animated.Text style={rStyle} entering={FadeIn} exiting={FadeOut}>
+              <Animated.Text
+                style={rStyle}
+                entering={FadeIn.delay(100).withCallback(() => {
+                  runOnJS(onCountdownVisible)();
+                  progress.value = withTiming(1, { duration: 500 }, () => {
+                    progress.value = withTiming(0);
+                    runOnJS(onCountdownScaled)(countdown);
+                  });
+                })}
+                exiting={FadeOut}
+              >
                 {current}
               </Animated.Text>
             ) : null}

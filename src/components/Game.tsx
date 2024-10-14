@@ -216,8 +216,13 @@ export function Game() {
       }),
   );
 
-  const { starsSpeed, shotSpeed, enemySpeed, enemyCreationInterval } =
-    useGameConfigSharedValues();
+  const {
+    starsSpeed,
+    shotSpeed,
+    enemySpeed,
+    enemyCreationInterval,
+    onResetConfig,
+  } = useGameConfigSharedValues();
 
   useGlobalFrameCallback({
     // canvas
@@ -260,6 +265,7 @@ export function Game() {
     if (!isFirstPlay) {
       enemies.value = [];
       shots.value = [];
+      onResetConfig();
     }
     setIsStartGameModalDisplayed(false);
     const displayCountdown = () => {

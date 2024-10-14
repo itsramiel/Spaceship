@@ -17,7 +17,7 @@ import {
   PRIMARY_COLOR,
   SECONDARY_COLOR,
   TERTIARY_COLOR,
-} from "../theme";
+} from "../config";
 
 const PARTIAL_CIRCLE_RATIO = 1 / 6;
 

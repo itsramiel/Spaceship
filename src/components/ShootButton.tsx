@@ -16,8 +16,8 @@ import {
   PRIMARY_COLOR,
   SECONDARY_COLOR,
   TERTIARY_COLOR,
-  CONITNUOUS_SHOOTING_RATE,
-} from "../theme";
+  CONTINUOUS_SHOOTING_RATE,
+} from "../config";
 import { SharedValue, useDerivedValue } from "react-native-reanimated";
 import React from "react";
 
@@ -92,7 +92,7 @@ export function ShootButton({
   });
 
   const strokeProgess = useDerivedValue(() => {
-    return 1 - continuousShootingRate.value / CONITNUOUS_SHOOTING_RATE;
+    return 1 - continuousShootingRate.value / CONTINUOUS_SHOOTING_RATE;
   }, []);
 
   return (

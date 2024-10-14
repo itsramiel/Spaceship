@@ -20,3 +20,7 @@ export type TRectSize = {
   width: number;
   height: number;
 };
+
+export type TGameInfo =
+  | { isPlaying: true }
+  | { isPlaying: false; didLose: boolean };

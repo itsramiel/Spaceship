@@ -4,7 +4,6 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
-  useFrameCallback,
   useSharedValue,
   withDelay,
   withTiming,
@@ -14,11 +13,11 @@ import {
   Canvas,
   Group,
   Image,
-  SkRect,
   Transforms3d,
   clamp,
   useImage,
 } from "@shopify/react-native-skia";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { Shots } from "./Shots";
@@ -26,65 +25,60 @@ import { Stars } from "./Stars";
 import { Enemies } from "./Enemies";
 import { Joystick } from "./Joystick";
 import { ShootButton } from "./ShootButton";
-import { TEnemy, TRectSize, TShot, TStar } from "../types";
+import { TEnemy, TGameInfo, TShot, TStar } from "../types";
 import {
-  CONITNUOUS_SHOOTING_RATE as CONTINUOUS_SHOOTING_RATE,
-  SHOT_LENGTH,
-  SHOT_STROKE_WIDTH,
+  CONSTANT_SHOOTING_INTERVAL,
+  CONTINUOUS_SHOOTING_RATE as CONTINUOUS_SHOOTING_RATE,
   SPACESHIP_IMAGE_HEIGHT,
   SPACESHIP_IMAGE_WIDTH,
   SPACESHIP_START_PADDING,
-} from "../theme";
+} from "../config";
 import { Score } from "./Score";
-import { areRectsIntersecting } from "../utils";
 import { PlayView } from "./PlayView";
 import { useState } from "react";
 import { Countdown } from "./Countdown";
+import { useGameConfigSharedValues, useGlobalFrameCallback } from "../hooks";
 import { SharedValuesProvider } from "./SharedValuesProvider";
 import { scoreStoreActions, selectIsFirstPlay, useScoreStore } from "../stores";
-import { StyleSheet, View } from "react-native";
-
-const ENEMY_SPEED = 1 / 16; // 1 point per 16 milliseconds
-const SHOT_SPEED = 3 / 16; // 3 points per 16 milliseconds
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
 
 const SHOOT_BUTTON_PADDING_RIGHT = 48;
-const CONSTANT_SHOOTING_INTERVAL = 100;
 
 export function Game() {
   const [isStartGameModalDisplayed, setIsStartGameModalDisplayed] =
     useState(true);
   const [isCountdownDisplayed, setIsCountdownDisplayed] = useState(false);
-  const gameInfo = useSharedValue<
-    { isPlaying: true } | { isPlaying: false; didLose: boolean }
-  >({ isPlaying: false, didLose: false });
+  const gameInfo = useSharedValue<TGameInfo>({
+    isPlaying: false,
+    didLose: false,
+  });
 
-  const size = useSharedValue({ width: 0, height: 0 });
+  const canvasSize = useSharedValue({ width: 0, height: 0 });
   const stars = useSharedValue<Array<TStar>>([]);
   const enemies = useSharedValue<Array<TEnemy>>([]);
 
   const joystickSize = useDerivedValue(() => {
-    return size.value.height / 3;
+    return canvasSize.value.height / 3;
   }, []);
 
   const continuousShootingRate = useSharedValue(CONTINUOUS_SHOOTING_RATE);
 
   const shootButtonSize = useDerivedValue(() => {
-    return size.value.height / 4;
+    return canvasSize.value.height / 4;
   }, []);
 
   const shootButtonTransform = useDerivedValue((): Transforms3d => {
     return [
       {
         translateX:
-          size.value.width -
+          canvasSize.value.width -
           shootButtonSize.value / 2 -
           SHOOT_BUTTON_PADDING_RIGHT,
       },
       {
-        translateY: size.value.height - joystickSize.value / 2,
+        translateY: canvasSize.value.height - joystickSize.value / 2,
       },
     ];
   }, []);
@@ -101,12 +95,12 @@ export function Game() {
       transform: [
         {
           translateX:
-            size.value.width -
+            canvasSize.value.width -
             shootButtonSize.value / 2 -
             SHOOT_BUTTON_PADDING_RIGHT,
         },
         {
-          translateY: size.value.height - joystickSize.value / 2,
+          translateY: canvasSize.value.height - joystickSize.value / 2,
         },
       ],
     };
@@ -125,7 +119,7 @@ export function Game() {
         { translateX: JOYSTICK_PADDING_HORIZONTAL + joystickSize.value / 2 },
         {
           translateY:
-            size.value.height -
+            canvasSize.value.height -
             joystickSize.value / 2 -
             JOYSTICK_PADDING_VERTICAL,
         },
@@ -138,7 +132,7 @@ export function Game() {
       { translateX: JOYSTICK_PADDING_HORIZONTAL + joystickSize.value / 2 },
       {
         translateY:
-          size.value.height -
+          canvasSize.value.height -
           joystickSize.value / 2 -
           JOYSTICK_PADDING_VERTICAL,
       },
@@ -151,7 +145,7 @@ export function Game() {
   const spaceshipImage = useImage(require("../../assets/rocket.png"));
 
   const spaceshipHeight = useDerivedValue(() => {
-    return 0.1 * size.value.width;
+    return 0.1 * canvasSize.value.width;
   }, []);
 
   const spaceshipWidth = useDerivedValue(() => {
@@ -165,7 +159,9 @@ export function Game() {
   }, []);
 
   const spaceshipY = useDerivedValue(() => {
-    return size.value.height / 2 - spaceshipHeight.value / 2 + panValueY.value;
+    return (
+      canvasSize.value.height / 2 - spaceshipHeight.value / 2 + panValueY.value
+    );
   }, []);
 
   const spaceshipPanTransform = useDerivedValue((): Transforms3d => {
@@ -178,12 +174,12 @@ export function Game() {
       panValueX.value = clamp(
         panValueX.value + e.changeX,
         -SPACESHIP_START_PADDING,
-        size.value.width - spaceshipWidth.value - SPACESHIP_START_PADDING,
+        canvasSize.value.width - spaceshipWidth.value - SPACESHIP_START_PADDING,
       );
       panValueY.value = clamp(
         panValueY.value + e.changeY,
-        -(size.value.height / 2),
-        size.value.height / 2,
+        -(canvasSize.value.height / 2),
+        canvasSize.value.height / 2,
       );
     });
 
@@ -195,7 +191,7 @@ export function Game() {
     "worklet";
     return {
       x: spaceshipWidth.value + SPACESHIP_START_PADDING + panValueX.value,
-      y: size.value.height / 2 + panValueY.value,
+      y: canvasSize.value.height / 2 + panValueY.value,
     };
   }
 
@@ -220,135 +216,34 @@ export function Game() {
       }),
   );
 
-  // Continuously move enemies, shots
-  useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;
+  const { starsSpeed, shotSpeed, enemySpeed, enemyCreationInterval } =
+    useGameConfigSharedValues();
 
-    const inFrameEnemies = Array<TEnemy>();
-
-    for (const enemy of enemies.value) {
-      if (enemy.x < -enemy.size / 2) continue;
-      enemy.x -= frameInfo.timeSincePreviousFrame * ENEMY_SPEED;
-      inFrameEnemies.push(enemy);
-    }
-
-    const inFrameShots = Array<TShot>();
-
-    for (const shot of shots.value) {
-      if (shot.x > size.value.width) continue;
-      shot.x += frameInfo.timeSincePreviousFrame * SHOT_SPEED;
-      inFrameShots.push(shot);
-    }
-
-    const newEnemies = Array<TEnemy>();
-    let intermediateShots = Array<TShot>();
-    let newShots = inFrameShots;
-
-    for (let i = 0; i < inFrameEnemies.length; i++) {
-      const enemy = inFrameEnemies[i];
-
-      let isEnemyDead = false;
-      for (const shot of newShots) {
-        if (isEnemyDead) {
-          intermediateShots.push(shot);
-          continue;
-        }
-
-        const shotEndX = shot.x + SHOT_LENGTH + SHOT_STROKE_WIDTH / 2;
-        const shotStartY = shot.y - SHOT_STROKE_WIDTH / 2;
-        const shotEndY = shot.y + SHOT_STROKE_WIDTH / 2;
-
-        const enemyStartX = enemy.x;
-        const enemyEndX = enemy.x + enemy.size;
-        const enemyStartY = enemy.y;
-        const enemyEndY = enemy.y + enemy.size;
-
-        const didShotHitEnemy =
-          shotEndX >= enemyStartX &&
-          shotEndX <= enemyEndX &&
-          ((shotEndY <= enemyStartY && shotEndY >= enemyEndY) ||
-            (shotStartY >= enemyStartY && shotStartY <= enemyEndY));
-        isEnemyDead = didShotHitEnemy;
-
-        if (!didShotHitEnemy) {
-          intermediateShots.push(shot);
-        }
-      }
-      newShots = intermediateShots;
-      intermediateShots = [];
-
-      if (!isEnemyDead) {
-        newEnemies.push(enemy);
-      } else {
-        runOnJS(scoreStoreActions.incrementScore)();
-      }
-    }
-
-    if (isLongPressShooting.value) {
-      if (continuousShootingRate.value > 0) {
-        if (msLastShotCreated.value >= CONSTANT_SHOOTING_INTERVAL) {
-          newShots.push(createShot());
-          msLastShotCreated.value = 0;
-        } else {
-          msLastShotCreated.value += frameInfo.timeSincePreviousFrame;
-        }
-
-        continuousShootingRate.value = Math.max(
-          continuousShootingRate.value - frameInfo.timeSincePreviousFrame,
-          0,
-        );
-      }
-    } else {
-      continuousShootingRate.value = Math.min(
-        continuousShootingRate.value + 1.5 * frameInfo.timeSincePreviousFrame,
-        CONTINUOUS_SHOOTING_RATE,
-      );
-    }
-
-    enemies.value = newEnemies;
-    shots.value = newShots;
-
-    const rectSizes: Array<TRectSize> = [
-      { width: 0.2, height: 1 },
-      { width: 0.6, height: 0.6 },
-      { width: 0.2, height: 0.2 },
-    ];
-
-    const rects = new Array<SkRect>();
-    for (let i = 0; i < rectSizes.length; i++) {
-      const rectSize = rectSizes[i];
-
-      const width = rectSize.width * spaceshipWidth.value;
-      const height = rectSize.height * spaceshipHeight.value;
-
-      const rect: SkRect = {
-        width: width,
-        height: height,
-        x:
-          spaceshipX.value +
-          rects.slice(0, i).reduce((acc, curr) => acc + curr.width, 0),
-        y: spaceshipY.value + (spaceshipHeight.value / 2 - height / 2),
-      };
-
-      rects.push(rect);
-    }
-    // Check if enemy reached leftmost edge of screen
-    rects.push({ x: -1, y: 0, width: 1, height: size.value.height });
-
-    for (const enemy of newEnemies) {
-      for (const rect of rects) {
-        const didEnemyHitSpaceShip = areRectsIntersecting(rect, {
-          x: enemy.x,
-          y: enemy.y,
-          width: enemy.size,
-          height: enemy.size,
-        });
-        if (didEnemyHitSpaceShip) {
-          gameInfo.value = { isPlaying: false, didLose: true };
-          break;
-        }
-      }
-    }
+  useGlobalFrameCallback({
+    // canvas
+    canvasSize,
+    // stars
+    stars,
+    starsSpeed,
+    // spaceship
+    spaceshipWidth,
+    spaceshipHeight,
+    spaceshipX,
+    spaceshipY,
+    // enemies
+    enemies,
+    enemySpeed,
+    enemyCreationInterval,
+    // shots
+    shotSpeed,
+    shots,
+    isLongPressShooting,
+    continuousShootingRate,
+    msLastShotCreated,
+    createShot,
+    // game state
+    gameInfo,
+    onScoreIncrement: scoreStoreActions.incrementScore,
   });
 
   useAnimatedReaction(
@@ -402,8 +297,8 @@ export function Game() {
 
   return (
     <View style={styles.screen}>
-      <Canvas style={styles.canvas} onSize={size}>
-        <SharedValuesProvider gameInfo={gameInfo} canvasSize={size}>
+      <Canvas style={styles.canvas} onSize={canvasSize}>
+        <SharedValuesProvider gameInfo={gameInfo} canvasSize={canvasSize}>
           <Stars stars={stars} />
           <Group transform={spaceshipPanTransform}>
             <Image

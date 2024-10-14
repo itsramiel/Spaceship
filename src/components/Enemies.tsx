@@ -1,9 +1,4 @@
-import {
-  SharedValue,
-  useDerivedValue,
-  useFrameCallback,
-  useSharedValue,
-} from "react-native-reanimated";
+import { SharedValue, useDerivedValue } from "react-native-reanimated";
 import {
   Picture,
   Skia,
@@ -11,10 +6,6 @@ import {
   useImage,
 } from "@shopify/react-native-skia";
 import { TEnemy } from "../types";
-import { useSharedValues } from "./SharedValuesProvider";
-
-const ENEMY_SIZE = 33;
-const ENEMY_CREATE_INTERVAL = 1000;
 
 interface EnemiesProps {
   enemies: SharedValue<Array<TEnemy>>;
@@ -37,34 +28,6 @@ export function Enemies({ enemies }: EnemiesProps) {
     image: useImage(require("../../assets/enemy4.png")),
     size: 478,
   };
-
-  const msLastEnemyCreated = useSharedValue(ENEMY_CREATE_INTERVAL);
-  const { gameInfo, canvasSize } = useSharedValues();
-
-  useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;
-
-    if (msLastEnemyCreated.value >= ENEMY_CREATE_INTERVAL) {
-      enemies.modify((value) => {
-        "worklet";
-        const enemySize =
-          (Math.random() * ENEMY_SIZE) / 4 + (ENEMY_SIZE * 3) / 4;
-
-        value.push({
-          x: canvasSize.value.width + enemySize / 2,
-          y: Math.random() * (canvasSize.value.height - enemySize),
-          size: enemySize,
-          type: Math.floor(Math.random() * 4),
-        });
-
-        return value;
-      });
-
-      msLastEnemyCreated.value = 0;
-    } else {
-      msLastEnemyCreated.value += frameInfo.timeSincePreviousFrame;
-    }
-  });
 
   const picture = useDerivedValue(() => {
     return createPicture((canvas) => {

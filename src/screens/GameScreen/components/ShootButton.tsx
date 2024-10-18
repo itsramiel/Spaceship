@@ -17,7 +17,7 @@ import {
   SECONDARY_COLOR,
   TERTIARY_COLOR,
   CONTINUOUS_SHOOTING_RATE,
-} from "../config";
+} from "../../../config";
 import { SharedValue, useDerivedValue } from "react-native-reanimated";
 import React from "react";
 

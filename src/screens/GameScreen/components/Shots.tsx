@@ -8,7 +8,7 @@ import {
   createPicture,
 } from "@shopify/react-native-skia";
 import { SharedValue, useDerivedValue } from "react-native-reanimated";
-import { PRIMARY_COLOR, SHOT_LENGTH, SHOT_STROKE_WIDTH } from "../config";
+import { PRIMARY_COLOR, SHOT_LENGTH, SHOT_STROKE_WIDTH } from "../../../config";
 
 interface ShotProps {
   shots: SharedValue<Array<SkPoint>>;

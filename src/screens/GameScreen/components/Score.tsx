@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { useScoreStore } from "../stores";
+import { useScoreStore } from "../../../stores";
 
 export function Score() {
   const score = useScoreStore((store) => store.state.latestScore);

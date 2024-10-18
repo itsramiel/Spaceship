@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button } from "./Button";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { useScoreStore } from "../stores";
+import { useScoreStore } from "../../../stores";
+import { Button } from "../../../components";
 
 interface PlayViewProps {
   onStartGame: () => void;

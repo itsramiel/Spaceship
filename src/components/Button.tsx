@@ -12,7 +12,7 @@ const SHADOW_OFFSET = 4;
 const PRESSED_SHADOW_OFFSET = 0.25 * SHADOW_OFFSET;
 
 interface ButtonProps {
-  onPress: () => void;
+  onPress?: () => void;
   text: string;
   color: ColorValue;
   shadowColor: ColorValue;

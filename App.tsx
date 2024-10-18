@@ -1,14 +1,14 @@
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import {Game} from './src/components/Game';
-import {Playground} from './src/components/Playground';
+import { Navigation } from "./src/navigation";
+import { Playground } from "./src/components/Playground";
 
 function App() {
   const renderGame = true;
 
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      {renderGame ? <Game /> : <Playground />}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      {renderGame ? <Navigation /> : <Playground />}
     </GestureHandlerRootView>
   );
 }

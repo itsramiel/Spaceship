@@ -13,19 +13,19 @@ interface EnemiesProps {
 
 export function Enemies({ enemies }: EnemiesProps) {
   const { image: enemy1Image, size: enemy1Size } = {
-    image: useImage(require("../../../../assets/enemy1.png")),
+    image: useImage(require("@/assets/images/enemy1.png")),
     size: 480,
   };
   const { image: enemy2Image, size: enemy2Size } = {
-    image: useImage(require("../../../../assets/enemy2.png")),
+    image: useImage(require("@/assets/images/enemy2.png")),
     size: 480,
   };
   const { image: enemy3Image, size: enemy3Size } = {
-    image: useImage(require("../../../../assets/enemy3.png")),
+    image: useImage(require("@/assets/images/enemy3.png")),
     size: 480,
   };
   const { image: enemy4Image, size: enemy4Size } = {
-    image: useImage(require("../../../../assets/enemy4.png")),
+    image: useImage(require("@/assets/images/enemy4.png")),
     size: 478,
   };
 

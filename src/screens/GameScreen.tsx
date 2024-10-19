@@ -17,7 +17,7 @@ import {
   clamp,
   useImage,
 } from "@shopify/react-native-skia";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
@@ -35,13 +35,13 @@ import {
   Countdown,
   Enemies,
   Joystick,
-  PlayView,
   Score,
   SharedValuesProvider,
   ShootButton,
   Shots,
   Stars,
 } from "./GameScreen/components";
+import { useNavigation } from "@react-navigation/native";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -49,12 +49,11 @@ const JOYSTICK_PADDING_VERTICAL = 4;
 const SHOOT_BUTTON_PADDING_RIGHT = 48;
 
 export function GameScreen() {
-  const [isStartGameModalDisplayed, setIsStartGameModalDisplayed] =
-    useState(true);
+  const navigation = useNavigation();
+
   const [isCountdownDisplayed, setIsCountdownDisplayed] = useState(false);
   const gameInfo = useSharedValue<TGameInfo>({
     isPlaying: false,
-    didLose: false,
   });
 
   const canvasSize = useSharedValue({ width: 0, height: 0 });
@@ -252,24 +251,13 @@ export function GameScreen() {
     gameInfo,
     onScoreIncrement: scoreStoreActions.incrementScore,
   });
-
-  useAnimatedReaction(
-    () => gameInfo.value,
-    (curr, prev) => {
-      if (curr && prev && !curr.isPlaying && prev.isPlaying) {
-        runOnJS(setIsStartGameModalDisplayed)(true);
-      }
-    },
-  );
-
-  function onStartGame() {
+  const onStartGame = useCallback(() => {
     const isFirstPlay = selectIsFirstPlay(useScoreStore.getState());
     if (!isFirstPlay) {
       enemies.value = [];
       shots.value = [];
       onResetConfig();
     }
-    setIsStartGameModalDisplayed(false);
     const displayCountdown = () => {
       setTimeout(() => {
         setIsCountdownDisplayed(true);
@@ -290,7 +278,28 @@ export function GameScreen() {
     } else {
       displayCountdown();
     }
-  }
+  }, [onResetConfig, setIsCountdownDisplayed]);
+
+  useEffect(() => {
+    onStartGame();
+  }, []);
+
+  const onGameOver = useCallback(() => {
+    navigation.navigate("GameOver", {
+      score: 90,
+      bestScore: 90,
+      onPlayAgain: onStartGame,
+    });
+  }, [onStartGame]);
+
+  useAnimatedReaction(
+    () => gameInfo.value,
+    (curr, prev) => {
+      if (curr && prev && !curr.isPlaying && prev.isPlaying) {
+        runOnJS(onGameOver)();
+      }
+    },
+  );
 
   function onCountdownEnd() {
     setIsCountdownDisplayed(false);
@@ -337,9 +346,6 @@ export function GameScreen() {
         <Animated.View style={shootButtonViewStyle} />
       </GestureDetector>
       <Score />
-      {isStartGameModalDisplayed ? (
-        <PlayView onStartGame={onStartGame} />
-      ) : null}
       {isCountdownDisplayed ? (
         <Countdown onCountdownEnd={onCountdownEnd} />
       ) : null}

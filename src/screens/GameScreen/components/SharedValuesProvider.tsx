@@ -1,10 +1,10 @@
 import React from "react";
 import { SharedValue } from "react-native-reanimated";
 
+import { TGameInfo } from "@/types";
+
 type TSharedValuesContext = {
-  gameInfo: SharedValue<
-    { isPlaying: true } | { isPlaying: false; didLose: boolean }
-  >;
+  gameInfo: SharedValue<TGameInfo>;
   canvasSize: SharedValue<{ width: number; height: number }>;
 };
 

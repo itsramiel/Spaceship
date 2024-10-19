@@ -4,6 +4,5 @@ export * from "./Shots";
 export * from "./Stars";
 export * from "./Enemies";
 export * from "./Joystick";
-export * from "./PlayView";
 export * from "./SharedValuesProvider";
 export * from "./Countdown";

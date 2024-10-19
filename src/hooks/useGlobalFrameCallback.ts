@@ -200,7 +200,7 @@ export function useGlobalFrameCallback({
           height: enemy.size,
         });
         if (didEnemyHitSpaceShip) {
-          gameInfo.value = { isPlaying: false, didLose: true };
+          gameInfo.value = { isPlaying: false };
           break;
         }
       }

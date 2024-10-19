@@ -4,23 +4,39 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { GameScreen, HomeScreen } from "../screens";
+import { GameOverScreen, GameScreen, HomeScreen } from "../screens";
+import { COLORS } from "@/config";
 
 const RootStack = createNativeStackNavigator({
+  initialRouteName: "Home",
+  screenOptions: {
+    headerShown: false,
+    animation: "fade",
+    gestureEnabled: false,
+    contentStyle: {
+      backgroundColor: COLORS["neutral/950"],
+    },
+  },
   screens: {
     Home: {
       screen: HomeScreen,
-      options: {
-        headerShown: false,
-      },
     },
     Game: {
       screen: GameScreen,
+    },
+    GameOver: {
+      screen: GameOverScreen,
       options: {
-        headerShown: false,
-        animation: "fade",
-        gestureEnabled: false,
+        presentation: "transparentModal",
+        contentStyle: {
+          backgroundColor: "transparent",
+        },
       },
+      // initialParams: {
+      //   score: 90,
+      //   bestScore: 90,
+      //   onPlayAgain: () => {},
+      // },
     },
   },
 });

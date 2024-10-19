@@ -21,6 +21,4 @@ export type TRectSize = {
   height: number;
 };
 
-export type TGameInfo =
-  | { isPlaying: true }
-  | { isPlaying: false; didLose: boolean };
+export type TGameInfo = { isPlaying: boolean };

@@ -19,8 +19,11 @@ export const TERTIARY_COLOR = "#404040";
 export const COLORS = {
   white: "#fff",
   "neutral/950": "#0A0A0A",
+  "neutral/700": "#404040",
   "red/500": "#EF4444",
   "red/600": "#DC2626",
   "yellow/500": "#EAB308",
   "yellow/600": "#CA8A04",
+  "stone/500": "#78716C",
+  "stone/600": "#57534E",
 };

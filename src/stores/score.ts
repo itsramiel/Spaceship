@@ -43,5 +43,3 @@ export const useScoreStore = create<TScoreStore>((set) => ({
 }));
 
 export const scoreStoreActions = useScoreStore.getState().actions;
-export const selectIsFirstPlay = (store: TScoreStore) =>
-  store.state.latestScore === null;

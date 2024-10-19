@@ -30,7 +30,7 @@ import {
   SPACESHIP_START_PADDING,
 } from "../config";
 import { useGameConfigSharedValues, useGlobalFrameCallback } from "../hooks";
-import { scoreStoreActions, selectIsFirstPlay, useScoreStore } from "../stores";
+import { scoreStoreActions } from "../stores";
 import {
   Countdown,
   Enemies,
@@ -251,13 +251,15 @@ export function GameScreen() {
     gameInfo,
     onScoreIncrement: scoreStoreActions.incrementScore,
   });
+
   const onStartGame = useCallback(() => {
-    const isFirstPlay = selectIsFirstPlay(useScoreStore.getState());
-    if (!isFirstPlay) {
-      enemies.value = [];
-      shots.value = [];
-      onResetConfig();
-    }
+    // clear out the score
+    scoreStoreActions.resetScore();
+
+    enemies.value = [];
+    shots.value = [];
+    onResetConfig();
+
     const displayCountdown = () => {
       setTimeout(() => {
         setIsCountdownDisplayed(true);
@@ -267,17 +269,13 @@ export function GameScreen() {
       duration: 1000,
       easing: Easing.inOut(Easing.ease),
     };
-    if (!isFirstPlay) {
-      panValueY.value = withDelay(300, withTiming(0, config));
-      panValueX.value = withDelay(
-        300,
-        withTiming(0, config, () => {
-          runOnJS(displayCountdown)();
-        }),
-      );
-    } else {
-      displayCountdown();
-    }
+    panValueY.value = withDelay(300, withTiming(0, config));
+    panValueX.value = withDelay(
+      300,
+      withTiming(0, config, () => {
+        runOnJS(displayCountdown)();
+      }),
+    );
   }, [onResetConfig, setIsCountdownDisplayed]);
 
   useEffect(() => {
@@ -286,8 +284,6 @@ export function GameScreen() {
 
   const onGameOver = useCallback(() => {
     navigation.navigate("GameOver", {
-      score: 90,
-      bestScore: 90,
       onPlayAgain: onStartGame,
     });
   }, [onStartGame]);
@@ -303,7 +299,6 @@ export function GameScreen() {
 
   function onCountdownEnd() {
     setIsCountdownDisplayed(false);
-    scoreStoreActions.resetScore();
 
     gameInfo.modify((value) => {
       "worklet";

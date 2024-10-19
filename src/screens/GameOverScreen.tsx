@@ -3,15 +3,15 @@ import { StaticScreenProps, useNavigation } from "@react-navigation/native";
 
 import { Button } from "@/components";
 import { COLORS } from "@/config";
+import { useScoreStore } from "@/stores";
 
 type Props = StaticScreenProps<{
-  score: number;
-  bestScore: number;
   onPlayAgain: () => void;
 }>;
 
 export function GameOverScreen({ route }: Props) {
   const navigation = useNavigation();
+  const { latestScore, bestScore } = useScoreStore((store) => store.state);
 
   const onExit = () => {
     navigation.navigate("Home");
@@ -27,9 +27,9 @@ export function GameOverScreen({ route }: Props) {
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Game Over!</Text>
         <View style={styles.scoresContainer}>
-          <Text style={styles.score}>Score: {route.params.score}</Text>
+          <Text style={styles.score}>Score: {latestScore}</Text>
           <Text style={styles.bestScore}>
-            Personal Best: {route.params.bestScore}
+            Personal Best: {bestScore ?? latestScore}
           </Text>
         </View>
         <View style={styles.buttonsContainer}>

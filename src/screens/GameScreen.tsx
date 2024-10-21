@@ -17,9 +17,12 @@ import {
   clamp,
   useImage,
 } from "@shopify/react-native-skia";
-import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+
+import { NetworkManager } from "@/network/models";
 
 import { TEnemy, TGameInfo, TShot, TStar } from "../types";
 import {
@@ -30,7 +33,7 @@ import {
   SPACESHIP_START_PADDING,
 } from "../config";
 import { useGameConfigSharedValues, useGlobalFrameCallback } from "../hooks";
-import { scoreStoreActions } from "../stores";
+import { scoreStoreActions, useScoreStore } from "../stores";
 import {
   Countdown,
   Enemies,
@@ -41,7 +44,6 @@ import {
   Shots,
   Stars,
 } from "./GameScreen/components";
-import { useNavigation } from "@react-navigation/native";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -283,6 +285,12 @@ export function GameScreen() {
   }, []);
 
   const onGameOver = useCallback(() => {
+    const score = useScoreStore.getState().state.latestScore;
+    if (typeof score === "number") {
+      NetworkManager.shared.sendScore(score);
+    } else {
+      // TODO: SENTRY
+    }
     navigation.navigate("GameOver", {
       onPlayAgain: onStartGame,
     });

@@ -1,8 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import {
+  createStyleSheet,
+  UnistylesRuntime,
+  useStyles,
+} from "react-native-unistyles";
 
 import { COLORS } from "../config";
 import { Button } from "../components";
+import { useIsSignedIn } from "@/stores/signedIn";
+import { AuthManager } from "@/managers";
 
 export function HomeScreen() {
   const navigation = useNavigation();
@@ -11,8 +18,27 @@ export function HomeScreen() {
     navigation.navigate("Game");
   };
 
+  const isSignedIn = useIsSignedIn();
+  const onAuthPress = () => {
+    if (isSignedIn) {
+      AuthManager.shared.signOut();
+    } else {
+      navigation.navigate("SignIn");
+    }
+  };
+
+  const { styles } = useStyles(stylesheet);
+
   return (
     <View style={styles.screen}>
+      <Button
+        size="sm"
+        text={isSignedIn ? "Sign out" : "Sign in/up"}
+        color={COLORS["blue/400"]}
+        shadowColor={COLORS["blue/500"]}
+        trailingIcon={isSignedIn ? "log-out-outline" : "log-in-outline"}
+        onPress={onAuthPress}
+      />
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Spaceship</Text>
         <View style={styles.buttonContainers}>
@@ -33,17 +59,27 @@ export function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet(() => ({
   screen: {
+    paddingVertical: Math.max(
+      UnistylesRuntime.insets.top,
+      UnistylesRuntime.insets.bottom,
+      48,
+    ),
+    paddingHorizontal: Math.max(
+      UnistylesRuntime.insets.left,
+      UnistylesRuntime.insets.right,
+      48,
+    ),
     backgroundColor: COLORS["neutral/950"],
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-end",
   },
   contentContainer: {
-    height: "50%",
+    flex: 1,
+    alignSelf: "stretch",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   title: {
     fontSize: 32,
@@ -54,4 +90,4 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 16,
   },
-});
+}));

@@ -1,5 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import { StaticScreenProps, useNavigation } from "@react-navigation/native";
+import {
+  StackActions,
+  StaticScreenProps,
+  useNavigation,
+} from "@react-navigation/native";
 
 import { Button } from "@/components";
 import { COLORS } from "@/config";
@@ -14,7 +18,7 @@ export function GameOverScreen({ route }: Props) {
   const { latestScore, bestScore } = useScoreStore((store) => store.state);
 
   const onExit = () => {
-    navigation.navigate("Home");
+    navigation.dispatch(StackActions.popTo("Home"));
   };
 
   const onPlayAgain = () => {

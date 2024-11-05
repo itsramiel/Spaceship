@@ -22,8 +22,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-import { NetworkManager } from "@/network/models";
-
 import { TEnemy, TGameInfo, TShot, TStar } from "../types";
 import {
   CONSTANT_SHOOTING_INTERVAL,
@@ -44,6 +42,7 @@ import {
   Shots,
   Stars,
 } from "./GameScreen/components";
+import { NetworkManager } from "@/managers";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;

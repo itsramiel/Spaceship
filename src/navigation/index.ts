@@ -4,39 +4,78 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { GameOverScreen, GameScreen, HomeScreen } from "../screens";
-import { COLORS } from "@/config";
+import { useIsSignedOut } from "@/stores";
+
+import {
+  GameOverScreen,
+  GameScreen,
+  HomeScreen,
+  SignInScreen,
+  SignUpScreen,
+  SignUpVerificationScreen,
+} from "../screens";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Home",
   screenOptions: {
-    headerShown: false,
-    animation: "fade",
-    gestureEnabled: false,
-    contentStyle: {
-      backgroundColor: COLORS["neutral/950"],
-    },
+    headerTitleAlign: "center",
+    headerBackButtonDisplayMode: "generic",
   },
-  screens: {
-    Home: {
-      screen: HomeScreen,
-    },
-    Game: {
-      screen: GameScreen,
-    },
-    GameOver: {
-      screen: GameOverScreen,
-      options: {
+  groups: {
+    Modal: {
+      screenOptions: {
+        headerShown: false,
+        animation: "fade",
+        gestureEnabled: false,
         presentation: "transparentModal",
         contentStyle: {
           backgroundColor: "transparent",
         },
       },
-      // initialParams: {
-      //   score: 90,
-      //   bestScore: 90,
-      //   onPlayAgain: () => {},
-      // },
+      screens: {
+        GameOver: GameOverScreen,
+      },
+    },
+    SignedOut: {
+      if: useIsSignedOut,
+      screens: {
+        SignIn: {
+          screen: SignInScreen,
+          options: {
+            title: "Sign In",
+          },
+        },
+        SignUp: {
+          screen: SignUpScreen,
+          options: {
+            title: "Sign Up",
+          },
+        },
+        SignUpVerification: {
+          screen: SignUpVerificationScreen,
+          options: {
+            title: "Verify Email",
+          },
+        },
+      },
+    },
+  },
+  screens: {
+    Home: {
+      screen: HomeScreen,
+      options: {
+        headerShown: false,
+        animation: "fade",
+        gestureEnabled: false,
+      },
+    },
+    Game: {
+      screen: GameScreen,
+      options: {
+        headerShown: false,
+        animation: "fade",
+        gestureEnabled: false,
+      },
     },
   },
 });

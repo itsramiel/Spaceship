@@ -1,9 +1,11 @@
 import { LogBox } from "react-native";
+import { DefaultTheme, Theme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { Navigation } from "./src/navigation";
 import { Playground } from "./src/components/Playground";
-import { DefaultTheme, Theme } from "@react-navigation/native";
+
+import "@/audio";
 import { COLORS } from "@/config";
 
 // I am aware of the consequences of this issue but I pass non-serializable

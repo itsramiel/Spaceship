@@ -10,7 +10,7 @@ import Animated, {
 import { StyleSheet, View } from "react-native";
 import { Fragment, useEffect, useState } from "react";
 
-import { useSound } from "../../../hooks/useSound";
+import { audioPlayers } from "@/audio";
 
 interface CountdownProps {
   onCountdownEnd: () => void;
@@ -19,7 +19,6 @@ interface CountdownProps {
 export function Countdown({ onCountdownEnd }: CountdownProps) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const progress = useSharedValue(0);
-  const beep = useSound(require("../../../../assets/sounds/beep.mp3"));
 
   const rStyle = useAnimatedStyle(() => {
     return {
@@ -31,7 +30,7 @@ export function Countdown({ onCountdownEnd }: CountdownProps) {
   }, []);
 
   const onCountdownVisible = () => {
-    beep?.playFromPositionAsync(0);
+    audioPlayers.beepPlayer?.playSound();
   };
 
   const onCountdownScaled = (countdown: number) => {
@@ -40,10 +39,8 @@ export function Countdown({ onCountdownEnd }: CountdownProps) {
   };
 
   useEffect(() => {
-    if (!beep) return;
-
     setCountdown(3);
-  }, [beep]);
+  }, []);
 
   if (typeof countdown !== "number") return null;
 

@@ -14,6 +14,7 @@ import {
   useStyles,
 } from "react-native-unistyles";
 import { COLORS } from "@/config";
+import { audioPlayers } from "@/audio";
 
 type TVariants = UnistylesVariants<typeof stylesheet>;
 type TSize = NonNullable<TVariants["size"]>;
@@ -47,8 +48,13 @@ export function Button({
   const bgStyles = useMemo(() => styles.background(color), [color]);
   const shadowStyles = useMemo(() => styles.shadow(shadowColor), [shadowColor]);
 
+  const onPressInternal = () => {
+    onPress?.();
+    audioPlayers.buttonClickPlayer?.playSound();
+  };
+
   return (
-    <Pressable style={[styles.container, style]} onPress={onPress}>
+    <Pressable style={[styles.container, style]} onPress={onPressInternal}>
       {({ pressed }) => (
         <>
           <View style={shadowStyles} />

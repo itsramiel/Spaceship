@@ -43,6 +43,7 @@ import {
   Stars,
 } from "./GameScreen/components";
 import { NetworkManager } from "@/managers";
+import { audioPlayers } from "@/audio";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -189,8 +190,13 @@ export function GameScreen() {
   const isLongPressShooting = useSharedValue(false);
   const msLastShotCreated = useSharedValue(0);
 
+  function playShotSound() {
+    audioPlayers.laserShotPlayer?.playSound();
+  }
+
   function createShot() {
     "worklet";
+
     return {
       x: spaceshipWidth.value + SPACESHIP_START_PADDING + panValueX.value,
       y: canvasSize.value.height / 2 + panValueY.value,
@@ -201,6 +207,8 @@ export function GameScreen() {
     Gesture.Tap()
       .maxDuration(250)
       .onStart(() => {
+        runOnJS(playShotSound)();
+
         shots.modify((value) => {
           value.push(createShot());
 
@@ -216,6 +224,26 @@ export function GameScreen() {
       .onEnd(() => {
         isLongPressShooting.value = false;
       }),
+  );
+
+  function onLonPressShootingStart() {
+    audioPlayers.laserShotPlayer?.loopSound(true);
+    audioPlayers.laserShotPlayer?.playSound();
+  }
+
+  function onLongPressShootingEnd() {
+    audioPlayers.laserShotPlayer?.loopSound(false);
+  }
+
+  useAnimatedReaction(
+    () => isLongPressShooting.get(),
+    (value) => {
+      if (value) {
+        runOnJS(onLonPressShootingStart)();
+      } else {
+        runOnJS(onLongPressShootingEnd)();
+      }
+    },
   );
 
   const {

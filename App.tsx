@@ -1,4 +1,5 @@
-import { LogBox } from "react-native";
+import { LogBox, StyleSheet } from "react-native";
+import { SystemBars, SystemBarsProps } from "react-native-edge-to-edge";
 import { DefaultTheme, Theme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -25,14 +26,26 @@ const theme: Theme = {
   },
 };
 
+const hiddenProps: SystemBarsProps["hidden"] = {
+  navigationBar: true,
+  statusBar: true,
+};
+
 function App() {
   const renderGame = true;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.GHRootView}>
       {renderGame ? <Navigation theme={theme} /> : <Playground />}
+      <SystemBars hidden={hiddenProps} />
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  GHRootView: {
+    flex: 1,
+  },
+});
 
 export default App;

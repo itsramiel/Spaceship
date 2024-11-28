@@ -14,7 +14,7 @@ import {
   useStyles,
 } from "react-native-unistyles";
 import { COLORS } from "@/config";
-import { audioPlayers } from "@/audio";
+import { audioPlayers } from "@/stores";
 
 type TVariants = UnistylesVariants<typeof stylesheet>;
 type TSize = NonNullable<TVariants["size"]>;

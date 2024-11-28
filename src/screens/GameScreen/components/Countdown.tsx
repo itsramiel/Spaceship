@@ -10,7 +10,7 @@ import Animated, {
 import { StyleSheet, View } from "react-native";
 import { Fragment, useEffect, useState } from "react";
 
-import { audioPlayers } from "@/audio";
+import { audioPlayers } from "@/stores";
 
 interface CountdownProps {
   onCountdownEnd: () => void;

@@ -31,7 +31,8 @@ import {
   SPACESHIP_START_PADDING,
 } from "../config";
 import { useGameConfigSharedValues, useGlobalFrameCallback } from "../hooks";
-import { scoreStoreActions, useScoreStore } from "../stores";
+import { audioPlayers, scoreStoreActions, useScoreStore } from "../stores";
+
 import {
   Countdown,
   Enemies,
@@ -43,7 +44,6 @@ import {
   Stars,
 } from "./GameScreen/components";
 import { NetworkManager } from "@/managers";
-import { audioPlayers } from "@/audio";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;

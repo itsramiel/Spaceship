@@ -3,12 +3,52 @@ import {
   UnistylesRuntime,
   useStyles,
 } from "react-native-unistyles";
+import { useCallback, useEffect } from "react";
 import { Image, Text, View } from "react-native";
 
 import { COLORS } from "@/config";
+import { audioPlayers, loadSounds, useSoundsLoadingProgress } from "@/stores";
+import Animated, {
+  runOnJS,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useDerivedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { StackActions, useNavigation } from "@react-navigation/native";
 
 export function LoadngScreen() {
+  const navigation = useNavigation();
   const { styles } = useStyles(stylesheet);
+  const progress = useSoundsLoadingProgress();
+
+  const animatedProgress = useDerivedValue(() => {
+    return withTiming(progress);
+  }, [progress]);
+
+  const onSoundsLoaded = useCallback(() => {
+    audioPlayers.backgroundPlayer?.loopSound(true);
+    audioPlayers.backgroundPlayer?.playSound();
+    navigation.dispatch(StackActions.replace("Home"));
+  }, []);
+
+  useAnimatedReaction(
+    () => animatedProgress.value === 1,
+    (didLoadSounds) => {
+      didLoadSounds && runOnJS(onSoundsLoaded)();
+    },
+    [onSoundsLoaded],
+  );
+
+  useEffect(() => {
+    loadSounds();
+  }, []);
+
+  const innerLoadingStyle = useAnimatedStyle(() => {
+    return {
+      width: `${animatedProgress.value * 100}%`,
+    };
+  }, []);
 
   return (
     <View style={styles.screen}>
@@ -19,7 +59,7 @@ export function LoadngScreen() {
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingTxt}>Loading...</Text>
         <View style={styles.loadingBar}>
-          <View style={styles.innerLoadingBar} />
+          <Animated.View style={[styles.innerLoadingBar, innerLoadingStyle]} />
         </View>
       </View>
     </View>
@@ -68,6 +108,5 @@ const stylesheet = createStyleSheet(() => ({
   innerLoadingBar: {
     height: 12,
     backgroundColor: COLORS["red/400"],
-    width: "50%",
   },
 }));

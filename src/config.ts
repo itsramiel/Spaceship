@@ -23,6 +23,8 @@ export const COLORS = {
   "neutral/800": "#262626",
   "neutral/700": "#404040",
   "neutral/300": "#D4D4D4",
+  "red/100": "#FEE2E2",
+  "red/400": "#F87171",
   "red/500": "#EF4444",
   "red/600": "#DC2626",
   "yellow/500": "#EAB308",

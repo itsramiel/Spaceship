@@ -10,13 +10,14 @@ import {
   GameOverScreen,
   GameScreen,
   HomeScreen,
+  LoadngScreen,
   SignInScreen,
   SignUpScreen,
   SignUpVerificationScreen,
 } from "../screens";
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: "Home",
+  initialRouteName: "Loading",
   screenOptions: {
     headerTitleAlign: "center",
     headerBackButtonDisplayMode: "generic",
@@ -61,6 +62,13 @@ const RootStack = createNativeStackNavigator({
     },
   },
   screens: {
+    Loading: {
+      screen: LoadngScreen,
+      options: {
+        headerShown: false,
+        animation: "fade",
+      },
+    },
     Home: {
       screen: HomeScreen,
       options: {

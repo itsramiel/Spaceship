@@ -23,27 +23,32 @@ export class NetworkManager {
       headers.append("Authorization", `Bearer ${accessToken}`);
     }
 
-    return fetch(`${this.baseUrl}/score`, {
+    const url = new URL(`${this.baseUrl}/score`);
+    url.searchParams.append("deviceId", this.deviceId);
+
+    return fetch(url, {
       method: "POST",
       headers: headers,
-      body: JSON.stringify({ deviceId: this.deviceId, score }),
+      body: JSON.stringify({ score }),
     });
   }
 
   public async signIn(email: string, password: string) {
-    const response = await fetch(`${this.baseUrl}/auth/login`, {
+    const url = new URL(`${this.baseUrl}/auth/login`);
+    url.searchParams.append("deviceId", this.deviceId);
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password, deviceId: this.deviceId }),
+      body: JSON.stringify({ email, password }),
     });
     return {
       response,
       parsed: async () => {
         try {
           const json = await response.json();
-          console.log("json", json);
           return v.parse(SignInResponseSchema, json);
         } catch (e) {
           console.log("e", e);

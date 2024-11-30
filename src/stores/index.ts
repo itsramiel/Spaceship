@@ -1,2 +1,2 @@
 export * from "./score";
-export * from "./soundsLoadingStore";
+export * from "./soundsStore";

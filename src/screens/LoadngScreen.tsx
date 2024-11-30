@@ -7,7 +7,6 @@ import { useCallback, useEffect } from "react";
 import { Image, Text, View } from "react-native";
 
 import { COLORS } from "@/config";
-import { audioPlayers, loadSounds, useSoundsLoadingProgress } from "@/stores";
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -16,19 +15,30 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { StackActions, useNavigation } from "@react-navigation/native";
+import { useSoundsStore } from "@/stores";
+import {
+  loadSounds,
+  openAudioStream,
+  playBackgroundMusic,
+  setupAudipStream,
+} from "@/audio";
 
 export function LoadngScreen() {
   const navigation = useNavigation();
   const { styles } = useStyles(stylesheet);
-  const progress = useSoundsLoadingProgress();
+  const progress = useSoundsStore((store) => {
+    console.log("store", store);
+    if (store.state.soundsCount === 0) return 0;
+    return store.state.loadedSoundsCount / store.state.soundsCount;
+  });
 
   const animatedProgress = useDerivedValue(() => {
     return withTiming(progress);
   }, [progress]);
 
   const onSoundsLoaded = useCallback(() => {
-    audioPlayers.backgroundPlayer?.loopSound(true);
-    audioPlayers.backgroundPlayer?.playSound();
+    openAudioStream();
+    playBackgroundMusic();
     navigation.dispatch(StackActions.replace("Home"));
   }, []);
 
@@ -41,6 +51,7 @@ export function LoadngScreen() {
   );
 
   useEffect(() => {
+    setupAudipStream();
     loadSounds();
   }, []);
 

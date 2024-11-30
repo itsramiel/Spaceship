@@ -16,10 +16,21 @@ export function HomeScreen() {
     navigation.navigate("Game");
   };
 
+  const onAudioSettingsPressed = () => {
+    navigation.navigate("AudioSettings");
+  };
+
   const { styles } = useStyles(stylesheet);
 
   return (
     <View style={styles.screen}>
+      <Button
+        size="sm"
+        text="Audio Settings"
+        color={COLORS["blue/400"]}
+        shadowColor={COLORS["blue/500"]}
+        onPress={onAudioSettingsPressed}
+      />
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Spaceship</Text>
         <View style={styles.buttonContainers}>

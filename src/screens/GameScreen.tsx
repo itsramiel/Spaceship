@@ -31,7 +31,7 @@ import {
   SPACESHIP_START_PADDING,
 } from "../config";
 import { useGameConfigSharedValues, useGlobalFrameCallback } from "../hooks";
-import { audioPlayers, scoreStoreActions } from "../stores";
+import { scoreStoreActions } from "../stores";
 
 import {
   Countdown,
@@ -43,6 +43,7 @@ import {
   Shots,
   Stars,
 } from "./GameScreen/components";
+import { loopLaserShotSound, playLaserShotSound } from "@/audio";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -189,10 +190,6 @@ export function GameScreen() {
   const isLongPressShooting = useSharedValue(false);
   const msLastShotCreated = useSharedValue(0);
 
-  function playShotSound() {
-    audioPlayers.laserShotPlayer?.playSound();
-  }
-
   function createShot() {
     "worklet";
 
@@ -206,7 +203,7 @@ export function GameScreen() {
     Gesture.Tap()
       .maxDuration(250)
       .onStart(() => {
-        runOnJS(playShotSound)();
+        runOnJS(playLaserShotSound)();
 
         shots.modify((value) => {
           value.push(createShot());
@@ -226,12 +223,12 @@ export function GameScreen() {
   );
 
   function onLonPressShootingStart() {
-    audioPlayers.laserShotPlayer?.loopSound(true);
-    audioPlayers.laserShotPlayer?.playSound();
+    loopLaserShotSound(true);
+    playLaserShotSound();
   }
 
   function onLongPressShootingEnd() {
-    audioPlayers.laserShotPlayer?.loopSound(false);
+    loopLaserShotSound(false);
   }
 
   useAnimatedReaction(

@@ -9,8 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { StyleSheet, View } from "react-native";
 import { Fragment, useEffect, useState } from "react";
-
-import { audioPlayers } from "@/stores";
+import { playBeepSound } from "@/audio";
 
 interface CountdownProps {
   onCountdownEnd: () => void;
@@ -30,7 +29,7 @@ export function Countdown({ onCountdownEnd }: CountdownProps) {
   }, []);
 
   const onCountdownVisible = () => {
-    audioPlayers.beepPlayer?.playSound();
+    playBeepSound();
   };
 
   const onCountdownScaled = (countdown: number) => {

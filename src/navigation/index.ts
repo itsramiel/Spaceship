@@ -5,6 +5,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import {
+  AudioSettingsScreen,
   GameOverScreen,
   GameScreen,
   HomeScreen,
@@ -42,6 +43,14 @@ const RootStack = createNativeStackNavigator({
     },
     Game: {
       screen: GameScreen,
+    },
+    AudioSettings: {
+      screen: AudioSettingsScreen,
+      options: {
+        headerShown: true,
+        headerTitle: "Audio Settings",
+        gestureEnabled: true,
+      },
     },
   },
 });

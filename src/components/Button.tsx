@@ -14,7 +14,7 @@ import {
   useStyles,
 } from "react-native-unistyles";
 import { COLORS } from "@/config";
-import { audioPlayers } from "@/stores";
+import { playButtonClickSound } from "@/audio";
 
 type TVariants = UnistylesVariants<typeof stylesheet>;
 type TSize = NonNullable<TVariants["size"]>;
@@ -50,7 +50,7 @@ export function Button({
 
   const onPressInternal = () => {
     onPress?.();
-    audioPlayers.buttonClickPlayer?.playSound();
+    playButtonClickSound();
   };
 
   return (

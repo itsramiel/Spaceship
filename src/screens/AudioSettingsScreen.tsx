@@ -6,14 +6,13 @@ import {
 } from "@/audio";
 import { COLORS } from "@/config";
 import { Slider, Switch } from "@/components";
-import { soundsStoreActions, useSoundsStore } from "@/stores";
+import { preferencesStoreActions, usePreferencesStore } from "@/stores";
 
 import {
   createStyleSheet,
   UnistylesRuntime,
   useStyles,
 } from "react-native-unistyles";
-import { useState } from "react";
 import { Text, View } from "react-native";
 
 export function AudioSettingsScreen() {
@@ -23,31 +22,30 @@ export function AudioSettingsScreen() {
     soundEffectsVolume,
     isSoundEffectsEnabled,
     backgroundMusicVolume,
-  } = useSoundsStore((store) => store.state.preferences);
+  } = usePreferencesStore((store) => store.state);
 
   const onBackgroundMusicSwitchChange = () => {
     if (isBackgroundMusicEnabled) {
       stopBackgroundMusic();
-      useSoundsStore.getState().actions.setBackgroundMusicEnabled(false);
+      usePreferencesStore.getState().actions.setBackgroundMusicEnabled(false);
     } else {
-      useSoundsStore.getState().actions.setBackgroundMusicEnabled(true);
+      usePreferencesStore.getState().actions.setBackgroundMusicEnabled(true);
       playBackgroundMusic();
     }
   };
 
   const onBackgroundMusicSliderChange = (value: number) => {
-    console.log("value", value);
     setBackgroundMusicVolume(value);
-    soundsStoreActions.setBackgroundMusicVolume(value);
+    preferencesStoreActions.setBackgroundMusicVolume(value);
   };
 
   const onSoundEffectsSwitchChange = () => {
-    soundsStoreActions.setSoundEffectsEnabled(!isSoundEffectsEnabled);
+    preferencesStoreActions.setSoundEffectsEnabled(!isSoundEffectsEnabled);
   };
 
   const onSoundEffectsSliderChange = (value: number) => {
     setSoundEffectsVolume(value);
-    soundsStoreActions.setSoundEffectsVolume(value);
+    preferencesStoreActions.setSoundEffectsVolume(value);
   };
 
   return (

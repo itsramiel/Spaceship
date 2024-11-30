@@ -1,6 +1,6 @@
 import { AudioManager, Player } from "react-native-audio-playback";
 
-import { getSoundsStoreState, soundsStoreActions } from "@/stores";
+import { getPreferencesStoreState } from "@/stores";
 
 export function setupAudipStream() {
   AudioManager.shared.setupAudioStream();
@@ -10,115 +10,131 @@ export function openAudioStream() {
   AudioManager.shared.openAudioStream();
 }
 
-let backgroundPlayer: Player | undefined;
-let beepPlayer: Player | undefined;
-let buttonClickPlayer: Player | undefined;
-let laserShotPlayer: Player | undefined;
+let backgroundPlayer: { player: Player | undefined } = { player: undefined };
+let beepPlayer: { player: Player | undefined } = { player: undefined };
+let buttonClickPlayer: { player: Player | undefined } = { player: undefined };
+let laserShotPlayer: { player: Player | undefined } = { player: undefined };
 
-soundsStoreActions.setSoundsCount(4);
+export function loadSounds(onProgressChange: (progress: number) => void) {
+  const data = [
+    [require("@/assets/sounds/bg-music1.mp3"), backgroundPlayer],
+    [require("@/assets/sounds/beep.mp3"), beepPlayer],
+    [require("@/assets/sounds/button-click1.mp3"), buttonClickPlayer],
+    [require("@/assets/sounds/laser-shot.mp3"), laserShotPlayer],
+  ] as const;
 
-export function loadSounds() {
-  AudioManager.shared
-    .loadSound(require("@/assets/sounds/bg-music1.mp3"))
-    .then((player) => {
-      console.log("player", player);
-      if (player instanceof Player) {
-        backgroundPlayer = player;
-        soundsStoreActions.incrementSoundsCount();
+  let loadedSoundsCount = 0;
+  const soundsCount = data.length;
+
+  for (let [asset, player] of data) {
+    AudioManager.shared.loadSound(asset).then((loadedPlayer) => {
+      if (loadedPlayer instanceof Player) {
+        player.player = loadedPlayer;
+        loadedSoundsCount++;
+        onProgressChange(loadedSoundsCount / soundsCount);
       }
     });
-  AudioManager.shared
-    .loadSound(require("@/assets/sounds/beep.mp3"))
-    .then((player) => {
-      console.log("player", player);
-      if (player instanceof Player) {
-        beepPlayer = player;
-        soundsStoreActions.incrementSoundsCount();
-      }
-    });
-  AudioManager.shared
-    .loadSound(require("@/assets/sounds/button-click1.mp3"))
-    .then((player) => {
-      console.log("player", player);
-      if (player instanceof Player) {
-        buttonClickPlayer = player;
-        soundsStoreActions.incrementSoundsCount();
-      }
-    });
-  AudioManager.shared
-    .loadSound(require("@/assets/sounds/laser-shot.mp3"))
-    .then((player) => {
-      console.log("player", player);
-      if (player instanceof Player) {
-        laserShotPlayer = player;
-        soundsStoreActions.incrementSoundsCount();
-      }
-    });
+  }
+}
+
+export function setupBackgroundMusic() {
+  if (backgroundPlayer.player) {
+    backgroundPlayer.player.loopSound(true);
+    backgroundPlayer.player.setVolume(
+      getPreferencesStoreState().backgroundMusicVolume,
+    );
+  }
 }
 
 export function playBackgroundMusic() {
   if (
-    getSoundsStoreState().preferences.isBackgroundMusicEnabled &&
-    backgroundPlayer
+    getPreferencesStoreState().isBackgroundMusicEnabled &&
+    backgroundPlayer.player
   ) {
-    backgroundPlayer.loopSound(true);
-    backgroundPlayer.playSound();
+    backgroundPlayer.player.playSound();
   }
 }
 
 export function stopBackgroundMusic() {
-  if (backgroundPlayer) {
-    backgroundPlayer.pauseSound();
+  if (backgroundPlayer.player) {
+    backgroundPlayer.player.pauseSound();
   }
 }
 
 export function setBackgroundMusicVolume(volume: number) {
-  if (backgroundPlayer) {
-    backgroundPlayer.setVolume(volume);
+  if (backgroundPlayer.player) {
+    backgroundPlayer.player.setVolume(volume);
+  }
+}
+
+export function setupSoundEffects() {
+  const players = [
+    beepPlayer.player,
+    buttonClickPlayer.player,
+    laserShotPlayer.player,
+  ].filter((player) => player) as Array<Player>;
+
+  const volume = getPreferencesStoreState().soundEffectsVolume;
+  AudioManager.shared.setSoundsVolume(
+    players.map((player) => [player, volume] as const),
+  );
+
+  if (beepPlayer.player) {
+    beepPlayer.player.setVolume(getPreferencesStoreState().soundEffectsVolume);
+  }
+  if (buttonClickPlayer.player) {
+    buttonClickPlayer.player.setVolume(
+      getPreferencesStoreState().soundEffectsVolume,
+    );
+  }
+  if (laserShotPlayer.player) {
+    laserShotPlayer.player.setVolume(
+      getPreferencesStoreState().soundEffectsVolume,
+    );
   }
 }
 
 export function playButtonClickSound() {
   if (
-    getSoundsStoreState().preferences.isSoundEffectsEnabled &&
-    buttonClickPlayer
+    getPreferencesStoreState().isSoundEffectsEnabled &&
+    buttonClickPlayer.player
   ) {
-    buttonClickPlayer.playSound();
+    buttonClickPlayer.player.playSound();
   }
 }
 
 export function playBeepSound() {
-  if (getSoundsStoreState().preferences.isSoundEffectsEnabled && beepPlayer) {
-    beepPlayer.playSound();
+  if (getPreferencesStoreState().isSoundEffectsEnabled && beepPlayer.player) {
+    beepPlayer.player.playSound();
   }
 }
 
 export function loopLaserShotSound(value: boolean) {
   if (
-    getSoundsStoreState().preferences.isSoundEffectsEnabled &&
-    laserShotPlayer
+    getPreferencesStoreState().isSoundEffectsEnabled &&
+    laserShotPlayer.player
   ) {
-    laserShotPlayer.loopSound(value);
+    laserShotPlayer.player.loopSound(value);
   }
 }
 
 export function playLaserShotSound() {
   if (
-    getSoundsStoreState().preferences.isSoundEffectsEnabled &&
-    laserShotPlayer
+    getPreferencesStoreState().isSoundEffectsEnabled &&
+    laserShotPlayer.player
   ) {
-    laserShotPlayer.playSound();
+    laserShotPlayer.player.playSound();
   }
 }
 
 export function setSoundEffectsVolume(volume: number) {
-  if (beepPlayer) {
-    beepPlayer.setVolume(volume);
+  if (beepPlayer.player) {
+    beepPlayer.player.setVolume(volume);
   }
-  if (buttonClickPlayer) {
-    buttonClickPlayer.setVolume(volume);
+  if (buttonClickPlayer.player) {
+    buttonClickPlayer.player.setVolume(volume);
   }
-  if (laserShotPlayer) {
-    laserShotPlayer.setVolume(volume);
+  if (laserShotPlayer.player) {
+    laserShotPlayer.player.setVolume(volume);
   }
 }

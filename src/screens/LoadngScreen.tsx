@@ -11,39 +11,34 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
+  useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { StackActions, useNavigation } from "@react-navigation/native";
-import { useSoundsStore } from "@/stores";
 import {
   loadSounds,
   openAudioStream,
   playBackgroundMusic,
   setupAudipStream,
+  setupBackgroundMusic,
+  setupSoundEffects,
 } from "@/audio";
 
 export function LoadngScreen() {
   const navigation = useNavigation();
   const { styles } = useStyles(stylesheet);
-  const progress = useSoundsStore((store) => {
-    console.log("store", store);
-    if (store.state.soundsCount === 0) return 0;
-    return store.state.loadedSoundsCount / store.state.soundsCount;
-  });
-
-  const animatedProgress = useDerivedValue(() => {
-    return withTiming(progress);
-  }, [progress]);
+  const progress = useSharedValue(0);
 
   const onSoundsLoaded = useCallback(() => {
     openAudioStream();
+    setupBackgroundMusic();
+    setupSoundEffects();
     playBackgroundMusic();
     navigation.dispatch(StackActions.replace("Home"));
   }, []);
 
   useAnimatedReaction(
-    () => animatedProgress.value === 1,
+    () => progress.value === 1,
     (didLoadSounds) => {
       didLoadSounds && runOnJS(onSoundsLoaded)();
     },
@@ -52,12 +47,12 @@ export function LoadngScreen() {
 
   useEffect(() => {
     setupAudipStream();
-    loadSounds();
+    loadSounds((newProgress) => progress.set(withTiming(newProgress)));
   }, []);
 
   const innerLoadingStyle = useAnimatedStyle(() => {
     return {
-      width: `${animatedProgress.value * 100}%`,
+      width: `${progress.get() * 100}%`,
     };
   }, []);
 

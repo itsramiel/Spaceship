@@ -4,16 +4,11 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { useIsSignedOut } from "@/stores";
-
 import {
   GameOverScreen,
   GameScreen,
   HomeScreen,
   LoadngScreen,
-  SignInScreen,
-  SignUpScreen,
-  SignUpVerificationScreen,
 } from "../screens";
 
 const RootStack = createNativeStackNavigator({
@@ -21,13 +16,13 @@ const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerTitleAlign: "center",
     headerBackButtonDisplayMode: "generic",
+    headerShown: false,
+    gestureEnabled: false,
+    animation: "fade",
   },
   groups: {
     Modal: {
       screenOptions: {
-        headerShown: false,
-        animation: "fade",
-        gestureEnabled: false,
         presentation: "transparentModal",
         contentStyle: {
           backgroundColor: "transparent",
@@ -37,53 +32,16 @@ const RootStack = createNativeStackNavigator({
         GameOver: GameOverScreen,
       },
     },
-    SignedOut: {
-      if: useIsSignedOut,
-      screens: {
-        SignIn: {
-          screen: SignInScreen,
-          options: {
-            title: "Sign In",
-          },
-        },
-        SignUp: {
-          screen: SignUpScreen,
-          options: {
-            title: "Sign Up",
-          },
-        },
-        SignUpVerification: {
-          screen: SignUpVerificationScreen,
-          options: {
-            title: "Verify Email",
-          },
-        },
-      },
-    },
   },
   screens: {
     Loading: {
       screen: LoadngScreen,
-      options: {
-        headerShown: false,
-        animation: "fade",
-      },
     },
     Home: {
       screen: HomeScreen,
-      options: {
-        headerShown: false,
-        animation: "fade",
-        gestureEnabled: false,
-      },
     },
     Game: {
       screen: GameScreen,
-      options: {
-        headerShown: false,
-        animation: "fade",
-        gestureEnabled: false,
-      },
     },
   },
 });

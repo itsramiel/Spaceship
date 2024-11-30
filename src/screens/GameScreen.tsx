@@ -31,7 +31,7 @@ import {
   SPACESHIP_START_PADDING,
 } from "../config";
 import { useGameConfigSharedValues, useGlobalFrameCallback } from "../hooks";
-import { audioPlayers, scoreStoreActions, useScoreStore } from "../stores";
+import { audioPlayers, scoreStoreActions } from "../stores";
 
 import {
   Countdown,
@@ -43,7 +43,6 @@ import {
   Shots,
   Stars,
 } from "./GameScreen/components";
-import { NetworkManager } from "@/managers";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -312,12 +311,6 @@ export function GameScreen() {
   }, []);
 
   const onGameOver = useCallback(() => {
-    const score = useScoreStore.getState().state.latestScore;
-    if (typeof score === "number") {
-      NetworkManager.shared.sendScore(score);
-    } else {
-      // TODO: SENTRY
-    }
     navigation.navigate("GameOver", {
       onPlayAgain: onStartGame,
     });

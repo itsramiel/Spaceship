@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import {
   AudioSettingsScreen,
+  DevelopmentScreen,
   GameOverScreen,
   GameScreen,
   HomeScreen,
@@ -35,6 +36,7 @@ const RootStack = createNativeStackNavigator({
     },
   },
   screens: {
+    Development: DevelopmentScreen,
     Loading: {
       screen: LoadngScreen,
     },

@@ -19,7 +19,7 @@ import {
 } from "@shopify/react-native-skia";
 import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { TEnemy, TGameInfo, TShot, TStar } from "../types";
@@ -52,8 +52,8 @@ const SHOOT_BUTTON_PADDING_RIGHT = 48;
 
 export function GameScreen() {
   const navigation = useNavigation();
+  const countdownRef = useRef<React.ComponentRef<typeof Countdown>>(null);
 
-  const [isCountdownDisplayed, setIsCountdownDisplayed] = useState(false);
   const gameInfo = useSharedValue<TGameInfo>({
     isPlaying: false,
   });
@@ -287,7 +287,7 @@ export function GameScreen() {
 
     const displayCountdown = () => {
       setTimeout(() => {
-        setIsCountdownDisplayed(true);
+        countdownRef.current?.startCountdown();
       }, 200);
     };
     const config: WithTimingConfig = {
@@ -301,7 +301,7 @@ export function GameScreen() {
         runOnJS(displayCountdown)();
       }),
     );
-  }, [onResetConfig, setIsCountdownDisplayed]);
+  }, [onResetConfig]);
 
   useEffect(() => {
     onStartGame();
@@ -323,8 +323,6 @@ export function GameScreen() {
   );
 
   function onCountdownEnd() {
-    setIsCountdownDisplayed(false);
-
     gameInfo.modify((value) => {
       "worklet";
       value.isPlaying = true;
@@ -366,9 +364,9 @@ export function GameScreen() {
         <Animated.View style={shootButtonViewStyle} />
       </GestureDetector>
       <Score />
-      {isCountdownDisplayed ? (
-        <Countdown onCountdownEnd={onCountdownEnd} />
-      ) : null}
+      <View style={[StyleSheet.absoluteFill, styles.countdownContainer]}>
+        <Countdown ref={countdownRef} onCountdownEnd={onCountdownEnd} />
+      </View>
     </View>
   );
 }
@@ -380,5 +378,9 @@ const styles = StyleSheet.create({
   },
   canvas: {
     flex: 1,
+  },
+  countdownContainer: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

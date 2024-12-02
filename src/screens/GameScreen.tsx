@@ -409,25 +409,27 @@ export function GameScreen() {
   );
 }
 
-const stylesheet = createStyleSheet({
-  screen: {
-    flex: 1,
-    backgroundColor: "#1E1E1E",
-  },
-  canvas: {
-    flex: 1,
-  },
-  countdownContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    pointerEvents: "none",
-  },
-  toolbar: {
-    alignItems: "center",
-    flexDirection: "row",
-    position: "absolute",
-    gap: 16,
-    top: Math.max(UnistylesRuntime.insets.top, 16),
-    right: Math.max(UnistylesRuntime.insets.right, 16),
-  },
+const stylesheet = createStyleSheet(() => {
+  return {
+    screen: {
+      flex: 1,
+      backgroundColor: "#1E1E1E",
+    },
+    canvas: {
+      flex: 1,
+    },
+    countdownContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      pointerEvents: "none",
+    },
+    toolbar: {
+      alignItems: "center",
+      flexDirection: "row",
+      position: "absolute",
+      gap: 16,
+      top: Math.max(UnistylesRuntime.insets.top, 16),
+      right: Math.max(UnistylesRuntime.insets.right, 16),
+    },
+  };
 });

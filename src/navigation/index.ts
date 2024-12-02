@@ -14,7 +14,7 @@ import {
 } from "../screens";
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: "Loading",
+  initialRouteName: "Home",
   screenOptions: {
     headerTitleAlign: "center",
     headerBackButtonDisplayMode: "generic",
@@ -49,6 +49,7 @@ const RootStack = createNativeStackNavigator({
     AudioSettings: {
       screen: AudioSettingsScreen,
       options: {
+        animation: "default",
         headerShown: true,
         headerTitle: "Audio Settings",
         gestureEnabled: true,

@@ -14,7 +14,7 @@ import {
 } from "../screens";
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: "Home",
+  initialRouteName: "Loading",
   screenOptions: {
     headerTitleAlign: "center",
     headerBackButtonDisplayMode: "generic",

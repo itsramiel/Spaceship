@@ -8,6 +8,7 @@ import { Playground } from "./src/components/Playground";
 
 import "@/audio";
 import { COLORS } from "@/config";
+import { useAppLifecycleAudioManager } from "@/hooks";
 
 // I am aware of the consequences of this issue but I pass non-serializable
 // values to screens I will never deep link to so it is fine
@@ -33,6 +34,7 @@ const hiddenProps: SystemBarsProps["hidden"] = {
 
 function App() {
   const renderGame = true;
+  useAppLifecycleAudioManager();
 
   return (
     <GestureHandlerRootView style={styles.GHRootView}>

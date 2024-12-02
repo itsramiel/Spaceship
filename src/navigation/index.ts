@@ -8,6 +8,7 @@ import {
   AudioSettingsScreen,
   DevelopmentScreen,
   GameOverScreen,
+  GamePausedScreen,
   GameScreen,
   HomeScreen,
   LoadngScreen,
@@ -32,6 +33,7 @@ const RootStack = createNativeStackNavigator({
       },
       screens: {
         GameOver: GameOverScreen,
+        GamePaused: GamePausedScreen,
       },
     },
   },

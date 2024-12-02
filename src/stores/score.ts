@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 type TScoreStore = {
   state: {
-    latestScore: number | null;
+    latestScore: number;
     bestScore: number | null;
   };
   actions: {
@@ -13,13 +13,13 @@ type TScoreStore = {
 
 export const useScoreStore = create<TScoreStore>((set) => ({
   state: {
-    latestScore: null,
+    latestScore: 0,
     bestScore: null,
   },
   actions: {
     incrementScore: () => {
       set(({ state: prevState }) => {
-        const score = (prevState.latestScore ?? 0) + 1;
+        const score = prevState.latestScore + 1;
         return {
           state: {
             ...prevState,

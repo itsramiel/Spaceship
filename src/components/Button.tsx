@@ -24,15 +24,15 @@ const IconSizeMap: Record<TSize, number> = {
   md: 24,
 };
 
-interface ButtonProps {
+type ButtonProps = {
   style?: ViewStyle;
   onPress?: () => void;
   size?: TVariants["size"];
-  text: string;
   color: ColorValue;
   shadowColor: ColorValue;
-  trailingIcon?: ComponentProps<typeof Ionicons>["name"];
-}
+  text?: string;
+  icon?: ComponentProps<typeof Ionicons>["name"];
+};
 
 export function Button({
   size = "md",
@@ -41,7 +41,7 @@ export function Button({
   shadowColor,
   onPress,
   style,
-  trailingIcon,
+  icon: trailingIcon,
 }: ButtonProps) {
   const { styles } = useStyles(stylesheet, { size });
 
@@ -59,10 +59,15 @@ export function Button({
         <>
           <View style={shadowStyles} />
           <View style={[bgStyles, pressed ? styles.pressed : undefined]} />
-          <View style={styles.contentContainer}>
-            <Text style={[styles.text, pressed ? styles.pressed : undefined]}>
-              {text}
-            </Text>
+          <View
+            style={[
+              styles.contentContainer,
+              pressed ? styles.pressed : undefined,
+            ]}
+          >
+            {typeof text === "string" ? (
+              <Text style={styles.text}>{text}</Text>
+            ) : null}
             {typeof trailingIcon === "string" ? (
               <Ionicons
                 name={trailingIcon}

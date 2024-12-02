@@ -19,11 +19,12 @@ import {
 } from "@shopify/react-native-skia";
 import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { TEnemy, TGameInfo, TShot, TStar } from "../types";
 import {
+  COLORS,
   CONSTANT_SHOOTING_INTERVAL,
   CONTINUOUS_SHOOTING_RATE as CONTINUOUS_SHOOTING_RATE,
   SPACESHIP_IMAGE_HEIGHT,
@@ -44,6 +45,12 @@ import {
   Stars,
 } from "./GameScreen/components";
 import { loopLaserShotSound, playLaserShotSound } from "@/audio";
+import {
+  createStyleSheet,
+  UnistylesRuntime,
+  useStyles,
+} from "react-native-unistyles";
+import { Button } from "@/components";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -51,6 +58,8 @@ const JOYSTICK_PADDING_VERTICAL = 4;
 const SHOOT_BUTTON_PADDING_RIGHT = 48;
 
 export function GameScreen() {
+  const { styles } = useStyles(stylesheet);
+
   const navigation = useNavigation();
   const countdownRef = useRef<React.ComponentRef<typeof Countdown>>(null);
 
@@ -330,6 +339,26 @@ export function GameScreen() {
     });
   }
 
+  const onPausedPress = useCallback(() => {
+    gameInfo.modify((value) => {
+      "worklet";
+      value.isPlaying = false;
+      return value;
+    });
+
+    navigation.navigate("GamePaused", {
+      onResume: () => {
+        navigation.goBack();
+
+        gameInfo.modify((value) => {
+          "worklet";
+          value.isPlaying = true;
+          return value;
+        });
+      },
+    });
+  }, []);
+
   return (
     <View style={styles.screen}>
       <Canvas style={styles.canvas} onSize={canvasSize}>
@@ -363,15 +392,24 @@ export function GameScreen() {
       <GestureDetector gesture={shootButtonGesture}>
         <Animated.View style={shootButtonViewStyle} />
       </GestureDetector>
-      <Score />
       <View style={[StyleSheet.absoluteFill, styles.countdownContainer]}>
         <Countdown ref={countdownRef} onCountdownEnd={onCountdownEnd} />
+      </View>
+      <View style={styles.toolbar}>
+        <Button
+          size="sm"
+          icon="pause"
+          color={COLORS["blue/400"]}
+          shadowColor={COLORS["blue/500"]}
+          onPress={onPausedPress}
+        />
+        <Score />
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet({
   screen: {
     flex: 1,
     backgroundColor: "#1E1E1E",
@@ -382,5 +420,14 @@ const styles = StyleSheet.create({
   countdownContainer: {
     alignItems: "center",
     justifyContent: "center",
+    pointerEvents: "none",
+  },
+  toolbar: {
+    alignItems: "center",
+    flexDirection: "row",
+    position: "absolute",
+    gap: 16,
+    top: Math.max(UnistylesRuntime.insets.top, 16),
+    right: Math.max(UnistylesRuntime.insets.right, 16),
   },
 });

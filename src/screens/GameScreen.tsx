@@ -264,7 +264,7 @@ export function GameScreen() {
     enemySpeed,
     enemyCreationInterval,
     onResetConfig,
-  } = useGameConfigSharedValues();
+  } = useGameConfigSharedValues(gameState);
 
   useGlobalFrameCallback({
     // canvas

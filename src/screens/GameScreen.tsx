@@ -19,7 +19,7 @@ import {
 } from "@shopify/react-native-skia";
 import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { TEnemy, TShot, TStar } from "../types";
@@ -64,7 +64,7 @@ export function GameScreen() {
   const navigation = useNavigation();
   const countdownRef = useRef<React.ComponentRef<typeof Countdown>>(null);
 
-  const gameInfo = useSharedValue<GameState>(GameState.Preparing);
+  const gameState = useSharedValue<GameState>(GameState.Preparing);
 
   const canvasSize = useSharedValue({ width: 0, height: 0 });
   const stars = useSharedValue<Array<TStar>>([]);
@@ -281,7 +281,7 @@ export function GameScreen() {
     msLastShotCreated,
     createShot,
     // game state
-    gameState: gameInfo,
+    gameState: gameState,
     onScoreIncrement: scoreStoreActions.incrementScore,
   });
 
@@ -318,7 +318,7 @@ export function GameScreen() {
   }, [onPrepareGame]);
 
   useAnimatedReaction(
-    () => gameInfo.value,
+    () => gameState.value,
     (curr) => {
       switch (curr) {
         case GameState.Preparing:
@@ -334,24 +334,30 @@ export function GameScreen() {
   );
 
   function onCountdownEnd() {
-    gameInfo.set(GameState.Playing);
+    gameState.set(GameState.Playing);
   }
 
   const onPausedPress = useCallback(() => {
-    gameInfo.set(GameState.Paused);
+    gameState.set(GameState.Paused);
 
     navigation.navigate("GamePaused", {
       onResume: () => {
         navigation.goBack();
-        gameInfo.set(GameState.Playing);
+        gameState.set(GameState.Playing);
       },
     });
+  }, []);
+
+  const rPauseButtonStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(gameState.get() === GameState.Playing ? 1 : 0),
+    };
   }, []);
 
   return (
     <View style={styles.screen}>
       <Canvas style={styles.canvas} onSize={canvasSize}>
-        <SharedValuesProvider gameInfo={gameInfo} canvasSize={canvasSize}>
+        <SharedValuesProvider gameInfo={gameState} canvasSize={canvasSize}>
           <Stars stars={stars} />
           <Group transform={spaceshipPanTransform}>
             <Image
@@ -385,13 +391,15 @@ export function GameScreen() {
         <Countdown ref={countdownRef} onCountdownEnd={onCountdownEnd} />
       </View>
       <View style={styles.toolbar}>
-        <Button
-          size="sm"
-          icon="pause"
-          color={COLORS["blue/400"]}
-          shadowColor={COLORS["blue/500"]}
-          onPress={onPausedPress}
-        />
+        <Animated.View style={rPauseButtonStyle}>
+          <Button
+            size="sm"
+            icon="pause"
+            color={COLORS["blue/400"]}
+            shadowColor={COLORS["blue/500"]}
+            onPress={onPausedPress}
+          />
+        </Animated.View>
         <Score />
       </View>
     </View>

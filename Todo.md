@@ -4,5 +4,5 @@
 - [x] pause audio when leaving the app
 - [x] Add a pause button while playing game
 - [x] add the pause button when the game is playing
-- [ ] make sure the controls do not work when the game didnt start yet
+- [x] make sure the controls do not work when the game didnt start yet
 - [ ] make sure difficulty doesnt go up when paused

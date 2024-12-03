@@ -182,6 +182,8 @@ export function GameScreen() {
   const gesture = Gesture.Pan()
     .minDistance(0)
     .onChange((e) => {
+      if (gameState.get() !== GameState.Playing) return;
+
       panValueX.value = clamp(
         panValueX.value + e.changeX,
         -SPACESHIP_START_PADDING,
@@ -211,6 +213,8 @@ export function GameScreen() {
     Gesture.Tap()
       .maxDuration(250)
       .onStart(() => {
+        if (gameState.get() !== GameState.Playing) return;
+
         runOnJS(playLaserShotSound)();
 
         shots.modify((value) => {
@@ -222,10 +226,14 @@ export function GameScreen() {
     Gesture.LongPress()
       .minDuration(250)
       .onStart(() => {
+        if (gameState.get() !== GameState.Playing) return;
+
         isLongPressShooting.value = true;
         msLastShotCreated.value = CONSTANT_SHOOTING_INTERVAL;
       })
       .onEnd(() => {
+        if (gameState.get() !== GameState.Playing) return;
+
         isLongPressShooting.value = false;
       }),
   );
@@ -312,6 +320,8 @@ export function GameScreen() {
   }, [onResetConfig]);
 
   const onGameOver = useCallback(() => {
+    isLongPressShooting.value = false;
+
     navigation.navigate("GameOver", {
       onPlayAgain: onPrepareGame,
     });

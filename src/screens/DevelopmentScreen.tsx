@@ -8,7 +8,7 @@ export function DevelopmentScreen() {
 
   return (
     <View style={styles.screen}>
-      <Countdown ref={ref} />
+      <Countdown onCountdownEnd={() => console.log("countdown ended")} />
       <Button title="start" onPress={() => ref.current?.startCountdown()} />
     </View>
   );

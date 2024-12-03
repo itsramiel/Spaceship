@@ -22,7 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useRef } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-import { TEnemy, TGameInfo, TShot, TStar } from "../types";
+import { TEnemy, TShot, TStar } from "../types";
 import {
   COLORS,
   CONSTANT_SHOOTING_INTERVAL,
@@ -51,6 +51,7 @@ import {
   useStyles,
 } from "react-native-unistyles";
 import { Button } from "@/components";
+import { GameState } from "./GameScreen/constants";
 
 const JOYSTICK_PADDING_HORIZONTAL = 4;
 const JOYSTICK_PADDING_VERTICAL = 4;
@@ -63,9 +64,7 @@ export function GameScreen() {
   const navigation = useNavigation();
   const countdownRef = useRef<React.ComponentRef<typeof Countdown>>(null);
 
-  const gameInfo = useSharedValue<TGameInfo>({
-    isPlaying: false,
-  });
+  const gameInfo = useSharedValue<GameState>(GameState.Preparing);
 
   const canvasSize = useSharedValue({ width: 0, height: 0 });
   const stars = useSharedValue<Array<TStar>>([]);
@@ -282,11 +281,11 @@ export function GameScreen() {
     msLastShotCreated,
     createShot,
     // game state
-    gameInfo,
+    gameState: gameInfo,
     onScoreIncrement: scoreStoreActions.incrementScore,
   });
 
-  const onStartGame = useCallback(() => {
+  const onPrepareGame = useCallback(() => {
     // clear out the score
     scoreStoreActions.resetScore();
 
@@ -312,49 +311,39 @@ export function GameScreen() {
     );
   }, [onResetConfig]);
 
-  useEffect(() => {
-    onStartGame();
-  }, []);
-
   const onGameOver = useCallback(() => {
     navigation.navigate("GameOver", {
-      onPlayAgain: onStartGame,
+      onPlayAgain: onPrepareGame,
     });
-  }, [onStartGame]);
+  }, [onPrepareGame]);
 
   useAnimatedReaction(
     () => gameInfo.value,
-    (curr, prev) => {
-      if (curr && prev && !curr.isPlaying && prev.isPlaying) {
-        runOnJS(onGameOver)();
+    (curr) => {
+      switch (curr) {
+        case GameState.Preparing:
+          runOnJS(onPrepareGame)();
+          break;
+        case GameState.Ended:
+          runOnJS(onGameOver)();
+          break;
+        default:
+          break;
       }
     },
   );
 
   function onCountdownEnd() {
-    gameInfo.modify((value) => {
-      "worklet";
-      value.isPlaying = true;
-      return value;
-    });
+    gameInfo.set(GameState.Playing);
   }
 
   const onPausedPress = useCallback(() => {
-    gameInfo.modify((value) => {
-      "worklet";
-      value.isPlaying = false;
-      return value;
-    });
+    gameInfo.set(GameState.Paused);
 
     navigation.navigate("GamePaused", {
       onResume: () => {
         navigation.goBack();
-
-        gameInfo.modify((value) => {
-          "worklet";
-          value.isPlaying = true;
-          return value;
-        });
+        gameInfo.set(GameState.Playing);
       },
     });
   }, []);

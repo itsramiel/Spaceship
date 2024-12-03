@@ -4,7 +4,7 @@ import {
   useFrameCallback,
   useSharedValue,
 } from "react-native-reanimated";
-import { TEnemy, TGameInfo, TRectSize, TShot, TStar } from "../types";
+import { TEnemy, TRectSize, TShot, TStar } from "../types";
 import {
   CONSTANT_SHOOTING_INTERVAL,
   CONTINUOUS_SHOOTING_RATE,
@@ -14,6 +14,7 @@ import {
 import { SkRect } from "@shopify/react-native-skia";
 import { areRectsIntersecting } from "../utils";
 import { ENEMY_SIZE } from "../config";
+import { GameState } from "@/screens/GameScreen/constants";
 
 type TUseGlobalFrameCallbackArgs = {
   // canvas
@@ -38,7 +39,7 @@ type TUseGlobalFrameCallbackArgs = {
   msLastShotCreated: SharedValue<number>;
   createShot: () => TShot;
   // game state
-  gameInfo: SharedValue<TGameInfo>;
+  gameState: SharedValue<GameState>;
   onScoreIncrement: () => void;
 };
 export function useGlobalFrameCallback({
@@ -64,13 +65,17 @@ export function useGlobalFrameCallback({
   msLastShotCreated,
   createShot,
   // game state
-  gameInfo,
+  gameState,
   onScoreIncrement,
 }: TUseGlobalFrameCallbackArgs) {
   const msLastEnemyCreated = useSharedValue(0);
 
   useFrameCallback((frameInfo) => {
-    if (!frameInfo.timeSincePreviousFrame || !gameInfo.value.isPlaying) return;
+    if (
+      !frameInfo.timeSincePreviousFrame ||
+      gameState.get() !== GameState.Playing
+    )
+      return;
     const timeSincePreviousFrame = frameInfo.timeSincePreviousFrame;
 
     // Filter out of bounds enemies
@@ -200,7 +205,7 @@ export function useGlobalFrameCallback({
           height: enemy.size,
         });
         if (didEnemyHitSpaceShip) {
-          gameInfo.value = { isPlaying: false };
+          gameState.set(GameState.Ended);
           break;
         }
       }

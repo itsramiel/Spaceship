@@ -1,10 +1,9 @@
 import React from "react";
 import { SharedValue } from "react-native-reanimated";
-
-import { TGameInfo } from "@/types";
+import { GameState } from "../constants";
 
 type TSharedValuesContext = {
-  gameInfo: SharedValue<TGameInfo>;
+  gameInfo: SharedValue<GameState>;
   canvasSize: SharedValue<{ width: number; height: number }>;
 };
 

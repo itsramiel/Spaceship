@@ -1,5 +1,3 @@
-import { COLORS } from "@/config";
-import { Pressable } from "react-native";
 import Animated, {
   interpolate,
   interpolateColor,
@@ -7,6 +5,10 @@ import Animated, {
   useDerivedValue,
   withTiming,
 } from "react-native-reanimated";
+import { Pressable } from "react-native";
+
+import { COLORS } from "@/config";
+import { playButtonClickSound } from "@/audio";
 
 const SWITCH_WIDTH = 65;
 const SWITCH_HEIGHT = 24;
@@ -24,7 +26,7 @@ interface SwitchProps {
   onPress: () => void;
 }
 
-export function Switch({ value, onPress }: SwitchProps) {
+export function Switch({ value, ...props }: SwitchProps) {
   const progress = useDerivedValue(() => withTiming(value ? 1 : 0), [value]);
 
   const containerStyles = useAnimatedStyle(() => {
@@ -57,6 +59,11 @@ export function Switch({ value, onPress }: SwitchProps) {
       ],
     };
   }, []);
+
+  const onPress = () => {
+    props.onPress();
+    playButtonClickSound();
+  };
 
   const animatedShadowStyles = useAnimatedStyle(() => {
     return {

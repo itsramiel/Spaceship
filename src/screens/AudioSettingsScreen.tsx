@@ -13,16 +13,24 @@ import {
   UnistylesRuntime,
   useStyles,
 } from "react-native-unistyles";
+import { useState } from "react";
 import { Text, View } from "react-native";
 
 export function AudioSettingsScreen() {
   const { styles } = useStyles(stylesheet);
-  const {
-    isBackgroundMusicEnabled,
-    soundEffectsVolume,
-    isSoundEffectsEnabled,
-    backgroundMusicVolume,
-  } = usePreferencesStore((store) => store.state);
+  const isSoundEffectsEnabled = usePreferencesStore(
+    (store) => store.state.isSoundEffectsEnabled,
+  );
+  const isBackgroundMusicEnabled = usePreferencesStore(
+    (store) => store.state.isBackgroundMusicEnabled,
+  );
+
+  const [initialBackgroundMusicVolume, _] = useState(
+    usePreferencesStore.getState().state.backgroundMusicVolume,
+  );
+  const [initialEffectsVolume, __] = useState(
+    usePreferencesStore.getState().state.backgroundMusicVolume,
+  );
 
   const onBackgroundMusicSwitchChange = () => {
     if (isBackgroundMusicEnabled) {
@@ -56,7 +64,7 @@ export function AudioSettingsScreen() {
           onSwitchChange={onBackgroundMusicSwitchChange}
           onSliderChange={onBackgroundMusicSliderChange}
           switchValue={isBackgroundMusicEnabled}
-          sliderValue={backgroundMusicVolume}
+          sliderValue={initialBackgroundMusicVolume}
         />
         <View style={styles.seperator} />
         <AudioSetting
@@ -64,7 +72,7 @@ export function AudioSettingsScreen() {
           onSwitchChange={onSoundEffectsSwitchChange}
           onSliderChange={onSoundEffectsSliderChange}
           switchValue={isSoundEffectsEnabled}
-          sliderValue={soundEffectsVolume}
+          sliderValue={initialEffectsVolume}
         />
       </View>
     </View>
